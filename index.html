@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CryptoPro — Smart Crypto Trading</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#000;--bg1:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--bg4:#222;
+  --green:#00c853;--green2:#00e676;--glow:rgba(0,200,83,.2);
+  --red:#ff1744;--red2:rgba(255,23,68,.12);
+  --blue:#2979ff;--purple:#7c4dff;--orange:#ff6d00;--yellow:#ffd600;
+  --teal:#00bcd4;--pink:#e91e63;
+  --text:#fff;--text2:#aaa;--text3:#555;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:12px;--r2:16px;--r3:24px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:#000;}
+::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideRight{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes glow{0%,100%{box-shadow:0 0 10px var(--glow)}50%{box-shadow:0 0 30px var(--glow),0 0 60px rgba(0,200,83,.1)}}
+
+.layer{display:none;min-height:100vh;animation:fadeUp .3s ease;}
+.layer.active{display:block;}
+
+.nav{height:56px;background:#000;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:500;}
+.nav-menu-btn{width:36px;height:36px;background:#1a1a1a;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:4px;flex-shrink:0;}
+.nav-menu-btn span{display:block;width:16px;height:2px;background:#fff;border-radius:1px;}
+.nav-logo{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.nav-logo-img{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--green),#00796b);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#000;animation:glow 3s ease-in-out infinite;}
+.nav-logo-txt{font-size:16px;font-weight:800;letter-spacing:-.3px;}
+.nav-logo-txt span{color:var(--green);}
+.nav-bell{width:36px;height:36px;background:#1a1a1a;border:none;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;position:relative;}
+.nav-bell-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #000;}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;display:none;backdrop-filter:blur(4px);}
+.drawer-overlay.open{display:block;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:300px;background:#0d0d0d;z-index:901;transform:translateX(-100%);transition:transform .3s ease;overflow-y:auto;display:flex;flex-direction:column;}
+.drawer.open{transform:translateX(0);}
+.drawer-head{padding:20px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a1a;}
+.drawer-user{display:flex;align-items:center;gap:12px;}
+.drawer-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+.drawer-name{font-size:15px;font-weight:700;}
+.drawer-email{font-size:11px;color:var(--text2);margin-top:2px;}
+.drawer-online{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;margin-left:5px;}
+.drawer-close{width:32px;height:32px;background:#1a1a1a;border:none;border-radius:8px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.drawer-items{padding:12px 10px;flex:1;}
+.drawer-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--r);margin-bottom:6px;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);}
+.drawer-item:hover{transform:translateX(4px);}
+.drawer-item-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.drawer-item-txt{flex:1;}
+.drawer-item-label{font-size:13px;font-weight:700;color:#fff;}
+.drawer-item-sub{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+.drawer-signout{padding:12px 10px;border-top:1px solid #1a1a1a;}
+.drawer-signout-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r);cursor:pointer;background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.15);width:100%;color:var(--red);font-size:13px;font-weight:700;font-family:var(--font);}
+
+#toast{position:fixed;top:66px;right:12px;left:12px;max-width:360px;margin:0 auto;padding:13px 16px;background:#1a1a1a;border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:9999;font-size:13px;line-height:1.6;display:none;animation:pop .2s ease;border-left:3px solid var(--green);}
+#toast.show{display:block;}
+#toast.ok{border-left-color:var(--green);}
+#toast.err{border-left-color:var(--red);}
+#toast.info{border-left-color:var(--blue);}
+#toast.warn{border-left-color:var(--yellow);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:800;display:none;align-items:flex-end;justify-content:center;padding:0;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:#111;border-radius:24px 24px 0 0;padding:24px 20px;width:100%;max-width:480px;animation:slideUp .3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:#333;border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
+
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:14px 16px;background:#1a1a1a;border:1.5px solid #2a2a2a;border-radius:var(--r);color:#fff;font-size:14px;font-family:var(--font);transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--green);}
+.fg select option{background:#1a1a1a;}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:48px;}
+.pw-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;padding:4px;}
+.form-err{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:12px;display:none;}
+.form-err.show{display:block;}
+
+.btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,var(--green),#00796b);color:#000;border:none;border-radius:var(--r);font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .2s;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px var(--glow);}
+.btn-secondary{width:100%;padding:14px;background:transparent;color:var(--green);border:1.5px solid var(--green);border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.btn-danger{width:100%;padding:14px;background:rgba(255,23,68,.1);color:var(--red);border:1.5px solid rgba(255,23,68,.2);border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.btn-ghost{padding:10px 20px;background:#1a1a1a;color:var(--text2);border:1px solid #2a2a2a;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);}
+
+.card{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:16px;}
+.card-dark{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:var(--r2);padding:16px;}
+
+.ticker-wrap{overflow:hidden;background:#0a0a0a;border-bottom:1px solid #1a1a1a;mask-image:linear-gradient(to right,transparent,black 5%,black 95%,transparent);}
+.ticker-inner{display:flex;gap:20px;animation:ticker 50s linear infinite;white-space:nowrap;padding:8px 0;}
+.tick-item{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;}
+.tick-sym{color:var(--text2);font-weight:600;}
+.tick-px{color:#fff;font-weight:600;}
+.tick-chg{font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;}
+.tick-up{color:var(--green);background:rgba(0,200,83,.1);}
+.tick-dn{color:var(--red);background:rgba(255,23,68,.1);}
+
+.wrap{max-width:480px;margin:0 auto;padding:14px 14px;}
+
+.welcome-hero{background:linear-gradient(135deg,#0d0d0d,#111);border-radius:var(--r3);padding:32px 20px;text-align:center;margin-bottom:14px;border:1px solid #1a1a1a;}
+.welcome-hero h1{font-size:28px;font-weight:900;margin-bottom:8px;line-height:1.2;}
+.welcome-hero h1 em{color:var(--green);font-style:normal;}
+.welcome-hero p{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.7;}
+.hero-btns{display:flex;flex-direction:column;gap:10px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stat-card{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:16px;text-align:center;}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:800;color:var(--green);}
+.stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+
+.auth-wrap{max-width:480px;margin:0 auto;padding:20px 14px;}
+.auth-logo{text-align:center;padding:32px 0 24px;}
+.auth-logo-mark{width:64px;height:64px;background:linear-gradient(135deg,var(--green),#00796b);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#000;margin:0 auto 12px;animation:glow 3s ease-in-out infinite;}
+.auth-card{background:#111;border:1px solid #1a1a1a;border-radius:var(--r3);padding:24px;}
+.auth-title{font-size:22px;font-weight:800;margin-bottom:4px;}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:22px;}
+.auth-switch{text-align:center;margin-top:18px;font-size:13px;color:var(--text2);}
+.auth-switch a{color:var(--green);font-weight:700;cursor:pointer;}
+
+.portfolio-card{background:linear-gradient(135deg,#1a0040,#0d1a4a,#001a2e);border-radius:var(--r3);padding:22px 20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.portfolio-card::after{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(124,77,255,.2),transparent);border-radius:50%;}
+.portfolio-lbl{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:6px;}
+.portfolio-val{font-family:var(--mono);font-size:36px;font-weight:900;margin-bottom:4px;}
+.portfolio-change{font-size:12px;color:rgba(255,255,255,.6);}
+.portfolio-change.up{color:var(--green);}
+.portfolio-btns{display:flex;gap:10px;margin-top:16px;}
+.portfolio-btn{flex:1;padding:11px;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;}
+.pb-dep{background:var(--green);color:#000;}
+.pb-trans{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.15);}
+.mini-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.mini-stat{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:14px;}
+.mini-stat-lbl{font-size:11px;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.mini-stat-val{font-family:var(--mono);font-size:22px;font-weight:800;}
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.price-card{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:13px;}
+.price-sym{font-size:12px;color:var(--text2);margin-bottom:4px;}
+.price-val{font-family:var(--mono);font-size:15px;font-weight:700;}
+.price-chg{font-size:11px;font-weight:700;margin-top:3px;}
+.price-chg.up{color:var(--green);}
+.price-chg.dn{color:var(--red);}
+.sec-title{font-size:15px;font-weight:800;margin-bottom:10px;}
+
+.wallet-hero{background:linear-gradient(135deg,#1a0040,#0d1a4a);border-radius:var(--r3);padding:24px 20px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;}
+.wallet-total-lbl{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:6px;}
+.wallet-total{font-family:var(--mono);font-size:32px;font-weight:900;margin-bottom:4px;}
+.wallet-usdt{font-size:12px;color:rgba(255,255,255,.5);}
+.wallet-btns{display:flex;gap:10px;margin-top:16px;}
+.wallet-btn{flex:1;padding:11px;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.wb-dep{background:var(--green);color:#000;}
+.wb-trans{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.15);}
+.wallet-type-card{border-radius:var(--r2);padding:16px;margin-bottom:10px;cursor:pointer;}
+.wtc-spot{background:linear-gradient(135deg,#1a0e00,#2d1800);}
+.wtc-fund{background:linear-gradient(135deg,#001040,#001a3a);}
+.wtc-label{font-size:14px;font-weight:700;margin-bottom:4px;}
+.wtc-sub{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:10px;}
+.wtc-val{font-family:var(--mono);font-size:22px;font-weight:800;}
+.crypto-asset{border-radius:var(--r2);margin-bottom:10px;overflow:hidden;}
+.ca-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;}
+.ca-left{display:flex;align-items:center;gap:12px;}
+.ca-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ca-sym{font-size:15px;font-weight:700;}
+.ca-name{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;}
+.ca-right{text-align:right;}
+.ca-price{font-family:var(--mono);font-size:14px;font-weight:700;}
+.ca-chg{font-size:11px;font-weight:700;margin-top:2px;}
+.ca-body{padding:0 16px 14px;}
+.ca-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.ca-row:last-child{border-bottom:none;}
+.ca-row-lbl{font-size:12px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:5px;}
+.ca-dot{width:7px;height:7px;border-radius:50%;}
+.ca-row-val{font-family:var(--mono);font-size:12px;font-weight:600;}
+.ca-est{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid rgba(255,255,255,.05);}
+.ca-est-lbl{font-size:12px;color:rgba(255,255,255,.5);}
+.ca-est-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--green);}
+.ca-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 14px;}
+.ca-dep-btn{padding:9px;background:var(--green);color:#000;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.ca-wd-btn{padding:9px;background:rgba(255,23,68,.1);color:var(--red);border:1px solid rgba(255,23,68,.2);border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.txn-empty{text-align:center;padding:32px;}
+.txn-empty-icon{font-size:40px;margin-bottom:10px;opacity:.4;}
+.txn-empty-txt{font-size:13px;color:var(--text2);}
+.make-deposit-btn{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border:none;border-radius:var(--r);padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:14px;}
+
+.dep-steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px;}
+.dep-step{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;transition:all .3s;}
+.dep-step.active{background:linear-gradient(135deg,var(--purple),var(--pink));}
+.dep-step.done{background:var(--green);color:#000;}
+.dep-step.inactive{background:#1a1a1a;color:#555;}
+.dep-step-line{flex:1;height:2px;background:#1a1a1a;max-width:40px;}
+.dep-step-line.done{background:var(--green);}
+.dep-step-title{text-align:center;margin-bottom:24px;}
+.dep-step-ico{font-size:40px;margin-bottom:10px;}
+.dep-crypto-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#1a1a1a;border:2px solid transparent;border-radius:var(--r2);margin-bottom:10px;cursor:pointer;transition:all .2s;}
+.dep-crypto-item.on{border-color:var(--green);background:rgba(0,200,83,.06);}
+.dep-crypto-left{display:flex;align-items:center;gap:12px;}
+.dep-crypto-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.dep-crypto-sym{font-size:14px;font-weight:700;}
+.dep-crypto-net{font-size:11px;color:var(--text2);margin-top:2px;}
+.dep-crypto-min{font-size:11px;color:var(--green);}
+.dep-net-tag{padding:4px 10px;background:#1a1a1a;border:1px solid #333;border-radius:6px;font-size:11px;font-weight:700;color:var(--text2);}
+.dep-radio{width:22px;height:22px;border-radius:50%;border:2px solid #333;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.dep-crypto-item.on .dep-radio{border-color:var(--green);background:var(--green);}
+.dep-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#000;opacity:0;transition:opacity .2s;}
+.dep-crypto-item.on .dep-radio::after{opacity:1;}
+.wallet-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.ws-card{padding:16px;border-radius:var(--r2);border:2px solid transparent;cursor:pointer;text-align:center;transition:all .2s;}
+.ws-card.on{border-color:var(--blue);}
+.ws-spot{background:linear-gradient(135deg,#1a0e00,#2d1800);}
+.ws-fund{background:linear-gradient(135deg,#001040,#001a3a);}
+.ws-icon{font-size:28px;margin-bottom:8px;}
+.ws-label{font-size:13px;font-weight:700;}
+.ws-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:2px;}
+.dep-notice{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:var(--r);padding:14px;margin:14px 0;}
+.dep-notice-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.dep-notice ul{padding-left:16px;}
+.dep-notice li{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:4px;line-height:1.5;}
+.dep-address-box{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);padding:14px;margin-bottom:12px;font-family:var(--mono);font-size:13px;color:var(--green);word-break:break-all;}
+.dep-copy-btn{width:100%;padding:12px;background:transparent;border:1.5px solid var(--green);border-radius:var(--r);color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;}
+.dep-info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:13px;}
+.dep-info-lbl{color:var(--text2);}
+.dep-info-val{font-weight:700;font-family:var(--mono);}
+.dep-timer{display:flex;align-items:center;gap:8px;background:rgba(255,214,0,.08);border:1px solid rgba(255,214,0,.2);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:14px;font-weight:700;color:var(--yellow);font-family:var(--mono);}
+.upload-zone{border:2px dashed #2a2a2a;border-radius:var(--r2);padding:28px;text-align:center;cursor:pointer;transition:border-color .2s;}
+.upload-zone:hover{border-color:var(--green);}
+.upload-zone-icon{font-size:32px;margin-bottom:8px;opacity:.5;}
+.upload-zone-txt{font-size:13px;color:var(--text2);}
+.continue-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:16px;transition:all .2s;}
+.continue-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.bots-header{padding:16px 14px 0;}
+.bots-header h2{font-size:22px;font-weight:900;color:var(--pink);margin-bottom:4px;}
+.bots-header p{font-size:12px;color:var(--text2);margin-bottom:14px;}
+.bots-stats{display:flex;gap:10px;margin-bottom:16px;}
+.bots-stat{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:30px;font-size:13px;font-weight:700;}
+.bots-stat-bal{background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.2);color:var(--green);}
+.bots-stat-trd{background:rgba(255,109,0,.1);border:1px solid rgba(255,109,0,.2);color:var(--orange);}
+.tier-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#111;border-radius:var(--r2);padding:8px;margin:0 14px 14px;}
+.tier-btn{padding:8px 6px;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);background:transparent;color:#555;transition:all .2s;}
+.tier-btn.on{background:#1a1a1a;color:#fff;}
+.tier-label{display:flex;align-items:center;gap:8px;padding:8px 14px;margin-bottom:8px;}
+.tier-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:800;}
+.tier-desc{font-size:12px;color:var(--text2);}
+.hot-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,var(--orange),var(--red));padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;color:#fff;margin-bottom:8px;}
+.bot-card{border-radius:var(--r2);padding:18px;margin:0 14px 10px;border:2px solid transparent;position:relative;cursor:pointer;transition:all .2s;}
+.bot-card.hot{border-color:var(--orange);}
+.bot-card:hover{transform:translateY(-2px);}
+.bot-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.bot-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.bot-pnl{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:800;font-family:var(--mono);}
+.bot-hot{font-size:11px;font-weight:700;color:var(--orange);display:flex;align-items:center;gap:4px;margin-top:4px;}
+.bot-name{font-size:17px;font-weight:800;color:var(--orange);margin-bottom:4px;}
+.bot-name.white{color:#fff;}
+.bot-desc{font-size:12px;color:var(--text2);margin-bottom:14px;}
+.bot-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.bot-meta-item label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:3px;}
+.bot-meta-item span{font-size:13px;font-weight:700;font-family:var(--mono);}
+.bot-traders{display:flex;align-items:center;gap:6px;padding:7px 10px;background:rgba(255,255,255,.04);border-radius:var(--r);margin-bottom:12px;font-size:12px;color:var(--text2);}
+.bot-traders strong{color:#fff;}
+.bot-need{display:flex;align-items:center;gap:7px;padding:10px 13px;background:rgba(255,214,0,.07);border:1px solid rgba(255,214,0,.15);border-radius:var(--r);margin-bottom:10px;font-size:12px;font-weight:600;color:var(--yellow);}
+.bot-start-btn{width:100%;padding:12px;border:none;border-radius:var(--r);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.bot-start-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.pair-list-item{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1a1a1a;cursor:pointer;}
+.pli-left{display:flex;align-items:center;gap:12px;}
+.pli-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.pli-sym{font-size:14px;font-weight:700;}
+.pli-name{font-size:11px;color:var(--text2);margin-top:2px;}
+.pli-mid{font-family:var(--mono);font-size:13px;font-weight:700;text-align:center;}
+.pli-chg{font-size:12px;font-weight:700;margin-top:3px;text-align:center;}
+.pli-view-btn{padding:7px 16px;border-radius:var(--r);font-size:12px;font-weight:700;border:1.5px solid var(--teal);color:var(--teal);background:transparent;cursor:pointer;font-family:var(--font);}
+.pli-view-btn.viewing{background:var(--teal);color:#000;}
+.chart-price-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.cpg-card{background:#111;border-radius:var(--r2);padding:14px;}
+.cpg-lbl{font-size:11px;color:var(--text2);margin-bottom:5px;}
+.cpg-val{font-family:var(--mono);font-size:18px;font-weight:700;}
+.cpg-val.green{color:var(--green);}
+.cpg-val.red{color:var(--red);}
+.cpg-val.blue{color:var(--blue);}
+.cpg-val.purple{color:var(--purple);}
+.chart-container{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:var(--r2);margin-bottom:14px;overflow:hidden;}
+.chart-header{padding:12px 14px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;}
+.chart-tf-btns{display:flex;gap:4px;}
+.chart-tf-btn{padding:5px 10px;background:transparent;border:none;border-radius:6px;color:#555;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--mono);transition:all .18s;}
+.chart-tf-btn.on{background:#1a1a1a;color:var(--teal);}
+.trade-tabs{display:grid;grid-template-columns:1fr 1fr;margin-bottom:14px;}
+.trade-tab{padding:12px;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--mono);background:#111;color:#555;transition:all .2s;}
+.trade-tab.buy.on{background:rgba(0,200,83,.1);color:var(--green);border-bottom:2px solid var(--green);}
+.trade-tab.sell.on{background:rgba(255,23,68,.1);color:var(--red);border-bottom:2px solid var(--red);}
+.trade-input-wrap{display:flex;align-items:center;background:#1a1a1a;border:1.5px solid #2a2a2a;border-radius:var(--r);overflow:hidden;margin-bottom:10px;transition:border-color .2s;}
+.trade-input-wrap:focus-within{border-color:rgba(0,200,83,.4);}
+.trade-input-wrap input{flex:1;padding:12px 14px;background:transparent;border:none;color:#fff;font-size:14px;font-family:var(--mono);outline:none;}
+.trade-input-sfx{padding:0 12px;font-size:12px;color:#555;font-family:var(--mono);font-weight:600;border-left:1px solid #2a2a2a;}
+.trade-execute-btn{width:100%;padding:14px;border:none;border-radius:var(--r);font-size:15px;font-weight:800;cursor:pointer;font-family:var(--mono);}
+.teb-buy{background:var(--green);color:#000;}
+.teb-sell{background:var(--red);color:#fff;}
+
+.spread-tabs{display:flex;background:#111;border-radius:var(--r2);padding:4px;margin-bottom:14px;}
+.spread-tab{flex:1;padding:9px;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);background:transparent;color:#555;transition:all .2s;}
+.spread-tab.on{background:#1a1a1a;color:#fff;}
+.spread-coin{display:flex;align-items:center;justify-content:space-between;padding:14px;background:#1a1a1a;border-radius:var(--r2);margin-bottom:10px;}
+.sc-left{display:flex;align-items:center;gap:12px;}
+.sc-icon{width:40px;height:40px;border-radius:50%;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.sc-sym{font-size:14px;font-weight:700;}
+.sc-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.sc-chg{font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;margin-left:8px;}
+.sc-actions{display:flex;gap:8px;}
+.sc-buy-btn{padding:8px 18px;background:rgba(0,200,83,.15);border:1px solid rgba(0,200,83,.3);border-radius:var(--r);color:var(--green);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.sc-sell-btn{padding:8px 18px;background:rgba(255,23,68,.12);border:1px solid rgba(255,23,68,.2);border-radius:var(--r);color:var(--red);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);}
+
+.settings-item{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1a1a1a;}
+.settings-lbl{font-size:13px;font-weight:600;}
+.settings-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.toggle{width:44px;height:24px;background:#2a2a2a;border-radius:12px;position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0;}
+.toggle.on{background:var(--green);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.toggle.on::after{left:23px;}
+
+.admin-overlay{position:fixed;inset:0;background:#000;z-index:9000;display:none;flex-direction:column;}
+.admin-overlay.show{display:flex;}
+.admin-nav{height:56px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;background:#0a0a0a;border-bottom:1px solid #1a1a1a;flex-shrink:0;}
+.admin-body{flex:1;overflow-y:auto;}
+.admin-tabs{display:flex;gap:6px;padding:10px 14px;background:#0a0a0a;border-bottom:1px solid #1a1a1a;overflow-x:auto;}
+.admin-tab{padding:7px 14px;border:none;border-radius:30px;background:#1a1a1a;color:#555;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font);}
+.admin-tab.on{background:var(--green);color:#000;}
+.ap{display:none;padding:14px;}
+.ap.active{display:block;animation:fadeUp .2s ease;}
+.a-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.a-stat{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:14px;text-align:center;}
+.a-stat-val{font-family:var(--mono);font-size:20px;font-weight:800;color:var(--green);}
+.a-stat-lbl{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+.dep-req{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:14px;margin-bottom:10px;}
+.dep-req-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.dep-req-name{font-size:13px;font-weight:700;}
+.dep-req-email{font-size:11px;color:var(--text2);}
+.dep-req-amt{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--green);}
+.dep-req-meta{font-size:11px;color:var(--text2);margin-bottom:10px;}
+.dep-req-proof{font-size:11px;color:var(--yellow);background:rgba(255,214,0,.06);padding:7px 10px;border-radius:var(--r);margin-bottom:10px;}
+.dep-req-actions{display:flex;gap:8px;}
+.abtn{padding:8px 14px;border:none;border-radius:var(--r);font-size:11px;font-weight:800;cursor:pointer;font-family:var(--font);}
+.abtn-g{background:var(--green);color:#000;}
+.abtn-r{background:rgba(255,23,68,.1);color:var(--red);border:1px solid rgba(255,23,68,.2);}
+.abtn-b{background:rgba(41,121,255,.1);color:var(--blue);border:1px solid rgba(41,121,255,.2);}
+.abtn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;}
+.a-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.a-tbl th{padding:8px;text-align:left;font-size:9px;color:#555;text-transform:uppercase;border-bottom:1px solid #1a1a1a;font-weight:700;}
+.a-tbl td{padding:8px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
+.a-tbl tr:hover td{background:rgba(255,255,255,.01);}
+.s-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;}
+.s-pending{background:rgba(255,214,0,.1);color:var(--yellow);}
+.s-credited{background:rgba(0,200,83,.1);color:var(--green);}
+.s-rejected{background:rgba(255,23,68,.1);color:var(--red);}
+.a-form input,.a-form select{width:100%;padding:10px 12px;background:#1a1a1a;border:1.5px solid #2a2a2a;border-radius:var(--r);color:#fff;font-size:12px;font-family:var(--font);margin-bottom:10px;}
+.a-form input:focus,.a-form select:focus{outline:none;border-color:var(--green);}
+.a-form label{display:block;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:700;}
+.abtn-submit{width:100%;padding:11px;border:none;border-radius:var(--r);background:var(--green);color:#000;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--font);}
+
+/* SUPPORT / CHAT */
+.chat-box{height:380px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#0a0a0a;border-radius:var(--r2);margin-bottom:10px;}
+.chat-msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55;animation:fadeUp .2s ease;}
+.chat-msg.bot{background:#1a1a1a;align-self:flex-start;border-bottom-left-radius:4px;}
+.chat-msg.user{background:linear-gradient(135deg,var(--green),#00796b);color:#000;align-self:flex-end;border-bottom-right-radius:4px;font-weight:600;}
+.chat-typing{background:#1a1a1a;align-self:flex-start;padding:10px 16px;border-radius:14px;border-bottom-left-radius:4px;font-size:20px;letter-spacing:3px;animation:fadeUp .2s ease;}
+.chat-input-row{display:flex;gap:8px;}
+.chat-input{flex:1;padding:12px 14px;background:#1a1a1a;border:1.5px solid #2a2a2a;border-radius:var(--r);color:#fff;font-size:13px;font-family:var(--font);}
+.chat-input:focus{outline:none;border-color:var(--green);}
+.chat-send{padding:12px 18px;background:var(--green);color:#000;border:none;border-radius:var(--r);font-weight:800;cursor:pointer;font-family:var(--font);}
+.chat-send:disabled{opacity:.5;cursor:not-allowed;}
+.quick-replies{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.qr-btn{padding:6px 12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;color:var(--text2);font-size:12px;cursor:pointer;font-family:var(--font);transition:all .2s;}
+.qr-btn:hover{border-color:var(--green);color:var(--green);}
+.contact-card{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--r2);text-decoration:none;margin-bottom:10px;}
+.cc-wa{background:linear-gradient(135deg,rgba(37,211,102,.1),rgba(18,140,126,.08));border:1px solid rgba(37,211,102,.2);}
+.cc-email{background:#111;border:1px solid #1a1a1a;}
+.cc-icon{font-size:28px;}
+.cc-title{font-size:14px;font-weight:700;}
+.cc-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.faq-item{border-bottom:1px solid #1a1a1a;}
+.faq-q{display:flex;justify-content:space-between;padding:13px 0;cursor:pointer;font-size:13px;font-weight:600;}
+.faq-q:hover{color:var(--green);}
+.faq-a{font-size:12px;color:var(--text2);line-height:1.7;padding-bottom:12px;display:none;}
+.faq-a.open{display:block;}
+
+.hist-row{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:14px;margin-bottom:10px;}
+.hr-top{display:flex;justify-content:space-between;margin-bottom:6px;}
+.hr-pair{font-weight:700;font-size:13px;}
+.hr-pnl{font-family:var(--mono);font-size:16px;font-weight:800;}
+.hr-meta{font-size:11px;color:var(--text2);}
+.hr-result{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:800;margin-top:4px;}
+.hr-win{background:rgba(0,200,83,.1);color:var(--green);}
+.hr-loss{background:rgba(255,23,68,.1);color:var(--red);}
+
+.ref-hero{background:linear-gradient(135deg,#0d001a,#001a0d);border:1px solid rgba(124,77,255,.2);border-radius:var(--r3);padding:24px;text-align:center;margin-bottom:14px;}
+.ref-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.ref-stat{background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:14px;text-align:center;}
+.ref-stat-val{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--green);}
+.ref-stat-lbl{font-size:10px;color:#555;margin-top:3px;}
+.ref-link-box{background:#1a1a1a;border:1px solid rgba(0,200,83,.2);border-radius:var(--r);padding:12px 14px;font-family:var(--mono);font-size:12px;color:var(--green);word-break:break-all;margin-bottom:10px;}
+.share-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.share-btn{padding:11px;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);}
+.sb-wa{background:#25D366;color:#fff;}
+.sb-tg{background:#0088cc;color:#fff;}
+.sb-tw{background:#1da1f2;color:#fff;}
+.sb-fb{background:#1877f2;color:#fff;}
+
+.wa-float{position:fixed;bottom:20px;right:20px;z-index:480;}
+.wa-float a{display:flex;align-items:center;justify-content:center;width:52px;height:52px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:50%;text-decoration:none;font-size:24px;box-shadow:0 4px 18px rgba(37,211,102,.4);}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#000;border-top:1px solid #1a1a1a;display:flex;z-index:400;max-width:480px;margin:0 auto;}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;transition:all .2s;}
+.bn-ico{font-size:20px;}
+.bn-lbl{font-size:9px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.3px;}
+.bn-item.on .bn-lbl{color:var(--green);}
+
+.wd-method{display:flex;flex-direction:column;align-items:center;padding:14px 10px;background:#1a1a1a;border:2px solid transparent;border-radius:var(--r2);cursor:pointer;transition:all .2s;text-align:center;}
+.wd-method.on{border-color:var(--green);background:rgba(0,200,83,.05);}
+.fee-box{background:#111;border:1px solid #1a1a1a;border-radius:var(--r);padding:12px;margin-bottom:14px;font-size:12px;}
+.fee-row{display:flex;justify-content:space-between;padding:4px 0;}
+.fee-row.total{border-top:1px solid #1a1a1a;margin-top:6px;padding-top:8px;font-weight:700;}
+
+.profile-avatar-wrap{text-align:center;padding:24px 0 18px;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;margin:0 auto 12px;}
+.profile-name{font-size:18px;font-weight:800;}
+.profile-email{font-size:13px;color:var(--text2);}
+.profile-joined{font-size:11px;color:#555;margin-top:4px;}
+
+@media(max-width:480px){
+  .wrap{padding:12px 12px 80px;}
+  .bots-header{padding:12px 12px 0;}
+  .tier-tabs{margin:0 12px 12px;}
+  .bot-card{margin:0 12px 10px;}
+  .tier-label{padding:8px 12px;}
+}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<div class="drawer" id="sideDrawer">
+  <div class="drawer-head">
+    <div class="drawer-user">
+      <div class="drawer-avatar" id="drawerAvatar">W</div>
+      <div>
+        <div class="drawer-name" id="drawerName">User <span class="drawer-online"></span></div>
+        <div class="drawer-email" id="drawerEmail">user@email.com</div>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-items">
+    <button class="drawer-item" onclick="navTo('L_dash');closeDrawer()" style="background:linear-gradient(135deg,#1a0040,#0d1a4a);">
+      <div class="drawer-item-ico" style="background:rgba(124,77,255,.2);">📊</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Portfolio Overview</div><div class="drawer-item-sub">Dashboard & Analytics</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_wallet');closeDrawer()" style="background:linear-gradient(135deg,#1a0e00,#2d1800);">
+      <div class="drawer-item-ico" style="background:rgba(255,109,0,.2);">💼</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Wallet</div><div class="drawer-item-sub">Spot & Funding Balances</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_deposit');closeDrawer()" style="background:linear-gradient(135deg,#001a0d,#003319);">
+      <div class="drawer-item-ico" style="background:rgba(0,200,83,.2);">➕</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Deposit</div><div class="drawer-item-sub">Add Cryptocurrency</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_withdraw');closeDrawer()" style="background:linear-gradient(135deg,#1a0d00,#2d1a00);">
+      <div class="drawer-item-ico" style="background:rgba(255,214,0,.2);">📤</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Withdrawal</div><div class="drawer-item-sub">Withdraw Funds</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_spot');closeDrawer()" style="background:linear-gradient(135deg,#001540,#001a4a);">
+      <div class="drawer-item-ico" style="background:rgba(0,188,212,.2);">📈</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Spot Trading</div><div class="drawer-item-sub">Trade Cryptocurrencies</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_spread');closeDrawer()" style="background:linear-gradient(135deg,#001a0d,#003319);">
+      <div class="drawer-item-ico" style="background:rgba(0,200,83,.2);">⇄</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Price Spread Trading</div><div class="drawer-item-sub">Spread Opportunities</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_bots');closeDrawer()" style="background:linear-gradient(135deg,#1a0020,#2d0040);">
+      <div class="drawer-item-ico" style="background:rgba(233,30,99,.2);">🤖</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Trading Bots</div><div class="drawer-item-sub">Automated Algorithms</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_history');closeDrawer()" style="background:linear-gradient(135deg,#001a2d,#002040);">
+      <div class="drawer-item-ico" style="background:rgba(0,188,212,.2);">🕐</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Transaction History</div><div class="drawer-item-sub">Deposits & Withdrawals</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_referral');closeDrawer()" style="background:linear-gradient(135deg,#0d1a00,#1a2d00);">
+      <div class="drawer-item-ico" style="background:rgba(0,200,83,.2);">🎁</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Earn</div><div class="drawer-item-sub">Earn Rewards</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_profile');closeDrawer()" style="background:linear-gradient(135deg,#001540,#002a6a);">
+      <div class="drawer-item-ico" style="background:rgba(41,121,255,.2);">🔐</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Security</div><div class="drawer-item-sub">Protection & Privacy</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_support');closeDrawer()" style="background:linear-gradient(135deg,#1a001a,#2d002d);">
+      <div class="drawer-item-ico" style="background:rgba(124,77,255,.2);">🎧</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Support</div><div class="drawer-item-sub">24/7 AI Assistance</div></div>
+    </button>
+    <button class="drawer-item" onclick="navTo('L_settings');closeDrawer()" style="background:#111;">
+      <div class="drawer-item-ico" style="background:#1a1a1a;">⚙️</div>
+      <div class="drawer-item-txt"><div class="drawer-item-label">Settings</div><div class="drawer-item-sub">Preferences</div></div>
+    </button>
+  </div>
+  <div class="drawer-signout">
+    <button class="drawer-signout-btn" onclick="doLogout()">
+      <span style="font-size:18px;">🚪</span> Sign Out
+    </button>
+  </div>
+</div>
+
+<!-- ADMIN CREDIT MODAL -->
+<div class="modal-overlay" id="aCreditModal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💰 Credit Account</div>
+    <div id="aCreditInfo" style="background:#1a1a1a;border-radius:var(--r);padding:12px;margin-bottom:14px;font-size:12px;line-height:2;color:var(--text2);"></div>
+    <div class="a-form">
+      <label>Credit Amount (USDT)</label><input type="number" id="aCreditAmt" placeholder="e.g. 100" min="1">
+      <label>Welcome Bonus (USDT)</label><input type="number" id="aBonusAmt" placeholder="e.g. 100">
+      <label>Admin Note</label><input type="text" id="aCreditNote" placeholder="e.g. TRC-20 confirmed">
+      <button class="abtn-submit" onclick="doAdminCredit()">✅ Credit Now</button>
+    </div>
+    <button onclick="closeModal('aCreditModal')" style="width:100%;padding:11px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;font-family:var(--font);">Cancel</button>
+  </div>
+</div>
+
+<!-- ORDER CONFIRM MODAL -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="orderModalTitle">Confirm Trade</div>
+    <div id="orderModalRows"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+      <button onclick="closeModal('orderModal')" style="padding:13px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);">Cancel</button>
+      <button id="orderConfirmBtn" onclick="confirmOrder()" style="padding:13px;border:none;border-radius:var(--r);font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);">✅ Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOT START MODAL -->
+<div class="modal-overlay" id="botModal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="botModalTitle">Start Bot</div>
+    <div id="botModalBody"></div>
+    <button class="btn-primary" id="botConfirmBtn" onclick="confirmStartBot()" style="margin-top:14px;">▶ Start Bot</button>
+    <button onclick="closeModal('botModal')" style="width:100%;padding:12px;background:#1a1a1a;border:none;border-radius:var(--r);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;font-family:var(--font);">Cancel</button>
+  </div>
+</div>
+
+<!-- ══════════════════ LAYERS ══════════════════ -->
+
+<!-- LAYER: WELCOME -->
+<div id="L_welcome" class="layer active">
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-img">₿</div>
+      <div class="nav-logo-txt">Crypto<span>Pro</span></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" onclick="showLayer('L_login')">Login</button>
+      <button style="padding:8px 16px;background:var(--green);color:#000;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);" onclick="showLayer('L_signup')">Sign Up</button>
+    </div>
+  </nav>
+  <div class="ticker-wrap"><div class="ticker-inner" id="wTicker"></div></div>
+  <div class="wrap" style="padding-bottom:20px;">
+    <div class="welcome-hero">
+      <div style="font-size:48px;margin-bottom:12px;">🚀</div>
+      <h1>Smart <em>Crypto</em> Trading Platform</h1>
+      <p>AI-powered bots, live charts, spot trading and more. Start with just $30 USDT.</p>
+      <div class="hero-btns">
+        <button style="padding:14px;background:linear-gradient(135deg,var(--green),#00796b);color:#000;border:none;border-radius:var(--r);font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);" onclick="showLayer('L_signup')">🎁 Create Free Account</button>
+        <button style="padding:14px;background:transparent;color:var(--teal);border:1.5px solid var(--teal);border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);" onclick="showLayer('L_spot')">📈 View Live Charts</button>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-val">50K+</div><div class="stat-lbl">Active Traders</div></div>
+      <div class="stat-card"><div class="stat-val">$125M+</div><div class="stat-lbl">Volume Traded</div></div>
+      <div class="stat-card"><div class="stat-val">25 Bots</div><div class="stat-lbl">Across 6 Tiers</div></div>
+      <div class="stat-card"><div class="stat-val">4.9★</div><div class="stat-lbl">User Rating</div></div>
+    </div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:12px;">⚡ Platform Features</div>
+    <div id="wFeatGrid" style="display:grid;gap:10px;margin-bottom:20px;"></div>
+    <div style="text-align:center;padding:28px 0;">
+      <h2 style="font-size:22px;font-weight:900;margin-bottom:8px;">Ready to Start Trading?</h2>
+      <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">Join 50,000+ traders today.</p>
+      <button style="padding:14px 32px;background:linear-gradient(135deg,var(--green),#00796b);color:#000;border:none;border-radius:var(--r);font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);" onclick="showLayer('L_signup')">Get Started Free →</button>
+    </div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: LOGIN -->
+<div id="L_login" class="layer">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">₿</div>
+      <div style="font-size:24px;font-weight:900;">Welcome Back</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px;">Sign in to continue trading</div>
+    </div>
+    <div class="auth-card">
+      <div class="form-err" id="lErr"></div>
+      <form onsubmit="return doLogin(event)">
+        <div class="fg"><label>Email Address</label><input type="email" id="lEmail" placeholder="you@email.com" required></div>
+        <div class="fg"><label>Password</label><div class="pw-wrap"><input type="password" id="lPw" placeholder="Your password" required><button type="button" class="pw-eye" onclick="togglePw('lPw',this)">👁</button></div></div>
+        <button type="submit" class="btn-primary">🔐 Sign In</button>
+      </form>
+      <div class="auth-switch">Don't have an account? <a onclick="showLayer('L_signup')">Sign up free →</a></div>
+    </div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: SIGNUP -->
+<div id="L_signup" class="layer">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-mark">💎</div>
+      <div style="background:rgba(255,214,0,.1);border:1px solid rgba(255,214,0,.2);border-radius:var(--r);padding:9px;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--yellow);">🎉 Get $30 FREE Demo Bonus on Signup!</div>
+      <div style="font-size:24px;font-weight:900;">Create Account</div>
+    </div>
+    <div class="auth-card">
+      <div class="form-err" id="sErr"></div>
+      <form onsubmit="return doSignup(event)">
+        <div class="fg"><label>Full Name</label><input type="text" id="sName" placeholder="Your full name" required></div>
+        <div class="fg"><label>Email Address</label><input type="email" id="sEmail" placeholder="you@email.com" required></div>
+        <div class="fg"><label>Phone Number</label><input type="tel" id="sPhone" placeholder="+254 712 345 678" required></div>
+        <div class="fg"><label>Password</label><div class="pw-wrap"><input type="password" id="sPw" placeholder="Min 6 characters" required><button type="button" class="pw-eye" onclick="togglePw('sPw',this)">👁</button></div></div>
+        <div class="fg"><label>Confirm Password</label><div class="pw-wrap"><input type="password" id="sPw2" placeholder="Re-enter password" required><button type="button" class="pw-eye" onclick="togglePw('sPw2',this)">👁</button></div></div>
+        <div class="fg"><label>Referral Code <span style="color:#555;font-weight:400;">(Optional)</span></label><input type="text" id="sRef" placeholder="Enter referral code"></div>
+        <button type="submit" class="btn-primary">🚀 Create Account</button>
+      </form>
+      <div class="auth-switch">Already have an account? <a onclick="showLayer('L_login')">Login →</a></div>
+    </div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: DASHBOARD -->
+<div id="L_dash" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div class="nav-logo" onclick="navTo('L_dash')">
+      <div class="nav-logo-img">₿</div>
+      <div class="nav-logo-txt">Crypto<span>Pro</span></div>
+    </div>
+    <button class="nav-bell" onclick="showToast('No new notifications','info')"><span>🔔</span><div class="nav-bell-dot"></div></button>
+  </nav>
+  <div class="ticker-wrap"><div class="ticker-inner" id="dTicker"></div></div>
+  <div class="wrap">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:20px;font-weight:900;">Portfolio Overview</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:3px;">Track your performance and recent activity</div>
+    </div>
+    <div class="portfolio-card">
+      <div class="portfolio-lbl">📊 Total Portfolio</div>
+      <div class="portfolio-val" id="dashPortfolio">$0.00</div>
+      <div class="portfolio-change" id="dashChange">+0.00%</div>
+      <div class="portfolio-btns">
+        <button class="portfolio-btn pb-dep" onclick="navTo('L_deposit')">+ Deposit</button>
+        <button class="portfolio-btn pb-trans" onclick="navTo('L_wallet')">⇄ Transfer</button>
+      </div>
+    </div>
+    <div class="mini-stat-grid">
+      <div class="mini-stat"><div class="mini-stat-lbl">↑↓ Total Trades</div><div class="mini-stat-val" id="dashTrades">0</div></div>
+      <div class="mini-stat"><div class="mini-stat-lbl">🎯 Success Rate</div><div class="mini-stat-val" id="dashWR">0%</div></div>
+    </div>
+    <div class="sec-title">Live Crypto Prices</div>
+    <div class="price-grid" id="dashPriceGrid"></div>
+    <div class="sec-title">Active Trading Bots</div>
+    <div id="dashActiveBots" style="margin-bottom:14px;"></div>
+    <div class="sec-title">Recent Activity</div>
+    <div id="dashRecent"></div>
+  </div>
+  <div class="bottom-nav">
+    <button class="bn-item on" onclick="navTo('L_dash')"><span class="bn-ico">📊</span><span class="bn-lbl">Dashboard</span></button>
+    <button class="bn-item" onclick="navTo('L_wallet')"><span class="bn-ico">💼</span><span class="bn-lbl">Wallet</span></button>
+    <button class="bn-item" onclick="navTo('L_bots')"><span class="bn-ico">🤖</span><span class="bn-lbl">Bots</span></button>
+    <button class="bn-item" onclick="navTo('L_spot')"><span class="bn-ico">📈</span><span class="bn-lbl">Trade</span></button>
+    <button class="bn-item" onclick="openDrawer()"><span class="bn-ico">☰</span><span class="bn-lbl">Menu</span></button>
+  </div>
+  <div class="wa-float" style="bottom:75px;"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: WALLET -->
+<div id="L_wallet" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div class="nav-logo" onclick="navTo('L_dash')"><div class="nav-logo-img">₿</div><div class="nav-logo-txt">Crypto<span>Pro</span></div></div>
+    <button class="nav-bell" onclick="showToast('No new notifications','info')"><span>🔔</span></button>
+  </nav>
+  <div class="wrap">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <button onclick="refreshWallet()" style="width:36px;height:36px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">🔄</button>
+    </div>
+    <div class="wallet-hero">
+      <div class="wallet-total-lbl">Total Assets (USDT)</div>
+      <div class="wallet-total" id="walletTotal">$0.00</div>
+      <div class="wallet-usdt" id="walletUSDT">≈ 0.00 USDT</div>
+      <div class="wallet-btns">
+        <button class="wallet-btn wb-dep" onclick="navTo('L_deposit')">+ Deposit</button>
+        <button class="wallet-btn wb-trans" onclick="showToast('Transfer between wallets','info')">⇄ Transfer</button>
+      </div>
+    </div>
+    <div class="wallet-type-card wtc-spot" onclick="showToast('Spot Wallet — for bot trading & investments','info')">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:36px;height:36px;background:rgba(255,109,0,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">💼</div>
+        <div class="wtc-label">Spot Wallet</div>
+      </div>
+      <div class="wtc-sub">For bot trading & investments</div>
+      <div class="wtc-val" id="spotBal">$0.00</div>
+    </div>
+    <div class="wallet-type-card wtc-fund" onclick="showToast('Funding Wallet — for deposits & withdrawals','info')">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:36px;height:36px;background:rgba(41,121,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">💳</div>
+        <div class="wtc-label">Funding Wallet</div>
+      </div>
+      <div class="wtc-sub">For deposits & withdrawals</div>
+      <div class="wtc-val" id="fundBal">$0.00</div>
+    </div>
+    <div class="sec-title" style="margin-top:18px;">Your Crypto Assets</div>
+    <div id="cryptoAssets"></div>
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:16px;margin-top:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="font-size:14px;font-weight:700;">Recent Transactions</div>
+        <div style="background:#1a1a1a;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;" id="txnCount">0 total</div>
+      </div>
+      <div id="txnList"></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <button class="bn-item" onclick="navTo('L_dash')"><span class="bn-ico">📊</span><span class="bn-lbl">Dashboard</span></button>
+    <button class="bn-item on" onclick="navTo('L_wallet')"><span class="bn-ico">💼</span><span class="bn-lbl">Wallet</span></button>
+    <button class="bn-item" onclick="navTo('L_bots')"><span class="bn-ico">🤖</span><span class="bn-lbl">Bots</span></button>
+    <button class="bn-item" onclick="navTo('L_spot')"><span class="bn-ico">📈</span><span class="bn-lbl">Trade</span></button>
+    <button class="bn-item" onclick="openDrawer()"><span class="bn-ico">☰</span><span class="bn-lbl">Menu</span></button>
+  </div>
+  <div class="wa-float" style="bottom:75px;"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: DEPOSIT -->
+<div id="L_deposit" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="navTo('L_wallet')"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Deposit</div>
+    <div style="width:36px;"></div>
+  </nav>
+  <div class="wrap" style="padding-top:20px;">
+    <div class="dep-steps" id="depStepIndicator"></div>
+    <div id="depStep1" class="dep-step-content">
+      <div class="dep-step-title">
+        <div class="dep-step-ico">🪙</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:4px;">Select Cryptocurrency</div>
+        <div style="font-size:13px;color:var(--text2);">Tap a coin to select it for deposit</div>
+      </div>
+      <div id="depCryptoList"></div>
+    </div>
+    <div id="depStep2" class="dep-step-content" style="display:none;">
+      <div style="font-size:18px;font-weight:800;margin-bottom:4px;">Deposit Details</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:18px;" id="depStep2Sub">Depositing USDT via TRC20</div>
+      <div style="background:#1a1a1a;border-radius:var(--r2);padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:18px;" id="depSelCryptoShow"></div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Fund to Wallet</div>
+      <div class="wallet-select" id="depWalletSelect"></div>
+      <div class="fg">
+        <label>Amount (USDT)</label>
+        <input type="number" id="depAmtInput" placeholder="Min: 30 USDT" min="30" oninput="updateDepFX()">
+        <div style="font-size:11px;color:#555;margin-top:5px;" id="depMinNote">Minimum deposit: 30 USDT</div>
+      </div>
+      <div id="depFXBox" style="background:rgba(0,200,83,.06);border:1px solid rgba(0,200,83,.15);border-radius:var(--r);padding:12px;margin-bottom:14px;display:none;">
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">💱 Currency Equivalent</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--blue);" id="depFXUSD">$0.00</div>
+          <div style="font-size:14px;color:var(--text2);">≈</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green);" id="depFXLocal">KES 0.00</div>
+        </div>
+      </div>
+    </div>
+    <div id="depStep3" class="dep-step-content" style="display:none;">
+      <div class="dep-timer" id="depTimer">⏱ 29:59</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;" id="depAddrLabel">Deposit Address</div>
+      <div class="dep-address-box" id="depAddressBox"></div>
+      <button class="dep-copy-btn" onclick="copyDepAddress()">📋 Copy Address</button>
+      <div style="margin:16px 0;border-bottom:1px solid #1a1a1a;"></div>
+      <div id="depStep3Info"></div>
+      <div class="dep-notice">
+        <div class="dep-notice-title">⚠️ Important Notice</div>
+        <ul>
+          <li>Send only the selected crypto to this address</li>
+          <li>Send the exact amount shown above</li>
+          <li>Sending wrong crypto may result in permanent loss</li>
+          <li id="depNoticeNet">Network must match selected network</li>
+        </ul>
+      </div>
+      <div style="font-size:13px;font-weight:700;margin:14px 0 8px;">Upload Payment Screenshot</div>
+      <div class="upload-zone" onclick="showToast('Screenshot noted — also send via WhatsApp for faster processing','info')">
+        <div class="upload-zone-icon">⬆️</div>
+        <div class="upload-zone-txt">Tap to upload screenshot</div>
+      </div>
+    </div>
+    <div id="depStep4" class="dep-step-content" style="display:none;">
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:56px;margin-bottom:14px;">✅</div>
+        <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Deposit Submitted!</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;" id="depSuccessMsg">Your deposit has been submitted. Admin will credit your account within 10 minutes.</div>
+        <button class="continue-btn" onclick="navTo('L_wallet')" style="background:var(--green);color:#000;">View Wallet</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;" id="depNavBtns">
+      <button id="depBackBtn" onclick="depBack()" style="flex:1;padding:14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);display:none;">← Back</button>
+      <button id="depNextBtn" onclick="depNext()" class="continue-btn" style="flex:2;margin:0;">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LAYER: WITHDRAW -->
+<div id="L_withdraw" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="navTo('L_wallet')"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Withdrawal</div>
+    <div style="width:36px;"></div>
+  </nav>
+  <div class="wrap">
+    <div class="wallet-hero" style="margin-bottom:14px;">
+      <div class="wallet-total-lbl">Real Account Balance</div>
+      <div class="wallet-total" id="wdBal">$0.00</div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
+        <div><div style="font-size:10px;color:#555;text-transform:uppercase;margin-bottom:4px;">Min</div><div style="font-family:var(--mono);font-weight:700;color:var(--green);">$50</div></div>
+        <div><div style="font-size:10px;color:#555;text-transform:uppercase;margin-bottom:4px;">Fee</div><div style="font-family:var(--mono);font-weight:700;">2%</div></div>
+        <div><div style="font-size:10px;color:#555;text-transform:uppercase;margin-bottom:4px;">Time</div><div style="font-family:var(--mono);font-weight:700;color:var(--blue);">5-30m</div></div>
+      </div>
+    </div>
+    <form onsubmit="return doWithdraw(event)">
+      <div class="fg"><label>Amount (USD)</label><input type="number" id="wdAmt" min="50" placeholder="Minimum $50" required oninput="calcWdFee()"></div>
+      <div class="fee-box" id="wdFeeBox" style="display:none;">
+        <div class="fee-row"><span style="color:var(--text2);">Requested</span><span id="wfAmt" style="font-family:var(--mono);">—</span></div>
+        <div class="fee-row"><span style="color:var(--text2);">Fee (2%)</span><span id="wfFee" style="font-family:var(--mono);color:var(--red);">—</span></div>
+        <div class="fee-row total"><span>You Receive</span><span id="wfNet" style="font-family:var(--mono);color:var(--green);">—</span></div>
+      </div>
+      <div class="fg">
+        <label>Withdrawal Method</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div class="wd-method" onclick="selWdMethod('mpesa',this)"><div style="font-size:22px;margin-bottom:4px;">📱</div><div style="font-size:12px;font-weight:700;">M-Pesa</div></div>
+          <div class="wd-method" onclick="selWdMethod('bank',this)"><div style="font-size:22px;margin-bottom:4px;">🏦</div><div style="font-size:12px;font-weight:700;">Bank</div></div>
+          <div class="wd-method" onclick="selWdMethod('usdt',this)"><div style="font-size:22px;margin-bottom:4px;">🪙</div><div style="font-size:12px;font-weight:700;">USDT</div></div>
+        </div>
+      </div>
+      <div id="wd-mpesa" style="display:none;" class="fg"><label>M-Pesa Phone</label><input type="tel" id="wdPhone" placeholder="+254 712 345 678"></div>
+      <div id="wd-bank" style="display:none;">
+        <div class="fg"><label>Bank Name</label><input type="text" id="wdBank" placeholder="e.g. Equity Bank"></div>
+        <div class="fg"><label>Account Number</label><input type="text" id="wdBankAcc" placeholder="Account number"></div>
+        <div class="fg"><label>Account Name</label><input type="text" id="wdBankName" placeholder="Account holder name"></div>
+      </div>
+      <div id="wd-usdt" style="display:none;">
+        <div class="fg"><label>USDT TRC-20 Address</label><input type="text" id="wdUsdt" placeholder="Your TRC-20 wallet address"></div>
+        <div style="background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);border-radius:var(--r);padding:10px;font-size:12px;color:var(--red);margin-bottom:14px;">⚠️ Only TRC-20. Wrong network = permanent loss.</div>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top:6px;">💸 Request Withdrawal</button>
+    </form>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: BOTS -->
+<div id="L_bots" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div class="nav-logo" onclick="navTo('L_dash')"><div class="nav-logo-img">₿</div><div class="nav-logo-txt">Crypto<span>Pro</span></div></div>
+    <button class="nav-bell" onclick="showToast('No new notifications','info')"><span>🔔</span></button>
+  </nav>
+  <div class="bots-header">
+    <h2>Trading Bots</h2>
+    <p>25 automated bots across 6 tiers — choose your trading strategy</p>
+    <div class="bots-stats">
+      <div class="bots-stat bots-stat-bal" id="botBalStat">💵 $0.00 USDT</div>
+      <div class="bots-stat bots-stat-trd" id="botTrdStat">🎯 2 Trades Left</div>
+    </div>
+  </div>
+  <div class="tier-tabs">
+    <button class="tier-btn on" onclick="filterBotTier('all',this)">All</button>
+    <button class="tier-btn" onclick="filterBotTier('T1',this)">T1</button>
+    <button class="tier-btn" onclick="filterBotTier('T2',this)">T2</button>
+    <button class="tier-btn" onclick="filterBotTier('T3',this)">T3</button>
+    <button class="tier-btn" onclick="filterBotTier('T4',this)">T4</button>
+    <button class="tier-btn" onclick="filterBotTier('T5',this)">T5</button>
+    <button class="tier-btn" onclick="filterBotTier('T6',this)">T6</button>
+    <button class="tier-btn" onclick="filterBotTier('T6',this)"></button>
+  </div>
+  <div id="botsList" style="padding-bottom:80px;"></div>
+  <div class="bottom-nav">
+    <button class="bn-item" onclick="navTo('L_dash')"><span class="bn-ico">📊</span><span class="bn-lbl">Dashboard</span></button>
+    <button class="bn-item" onclick="navTo('L_wallet')"><span class="bn-ico">💼</span><span class="bn-lbl">Wallet</span></button>
+    <button class="bn-item on" onclick="navTo('L_bots')"><span class="bn-ico">🤖</span><span class="bn-lbl">Bots</span></button>
+    <button class="bn-item" onclick="navTo('L_spot')"><span class="bn-ico">📈</span><span class="bn-lbl">Trade</span></button>
+    <button class="bn-item" onclick="openDrawer()"><span class="bn-ico">☰</span><span class="bn-lbl">Menu</span></button>
+  </div>
+</div>
+
+<!-- LAYER: SPOT TRADING -->
+<div id="L_spot" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Spot Trading</div>
+    <button class="nav-bell" onclick="showToast('No new notifications','info')"><span>🔔</span></button>
+  </nav>
+  <div id="spotPairList" style="display:block;">
+    <div class="wrap">
+      <div style="font-size:15px;font-weight:800;margin-bottom:14px;">⭐ All Trading Pairs</div>
+      <div style="background:#1a1a1a;border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-size:16px;">🔍</span>
+        <input type="text" id="pairSearch" placeholder="Search coins..." style="background:transparent;border:none;color:#fff;font-size:13px;outline:none;flex:1;font-family:var(--font);" oninput="filterPairs()">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#111;border-radius:var(--r2);padding:6px;margin-bottom:14px;">
+        <button class="spread-tab on" onclick="filterSpotType('all',this)">All</button>
+        <button class="spread-tab" onclick="filterSpotType('up',this)">📈 Gainers</button>
+      </div>
+      <div id="pairListEl"></div>
+    </div>
+  </div>
+  <div id="spotChart" style="display:none;">
+    <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #1a1a1a;">
+      <button onclick="showSpotList()" style="background:#1a1a1a;border:none;border-radius:var(--r);color:var(--text2);padding:7px 12px;font-size:13px;cursor:pointer;font-family:var(--font);">← Back</button>
+      <div style="font-size:15px;font-weight:800;" id="chartPairTitle">BTC/USDT</div>
+    </div>
+    <div class="chart-price-grid" style="padding:12px 14px;">
+      <div class="cpg-card"><div class="cpg-lbl">Price</div><div class="cpg-val green" id="chartPrice">$0.00</div></div>
+      <div class="cpg-card"><div class="cpg-lbl">24h Change</div><div class="cpg-val green" id="chartChg">+0.00%</div></div>
+      <div class="cpg-card"><div class="cpg-lbl">24h High</div><div class="cpg-val blue" id="chartHigh">$0.00</div></div>
+      <div class="cpg-card"><div class="cpg-lbl">24h Low</div><div class="cpg-val red" id="chartLow">$0.00</div></div>
+      <div class="cpg-card"><div class="cpg-lbl">24h Volume</div><div class="cpg-val purple" id="chartVol">0.00B</div></div>
+      <div class="cpg-card"><div class="cpg-lbl">Volume USDT</div><div class="cpg-val purple" id="chartVolUSDT">$0.00B</div></div>
+    </div>
+    <div class="chart-container" style="margin:0 14px 14px;">
+      <div class="chart-header">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;">
+          📊 Live Chart
+          <div style="display:flex;align-items:center;gap:5px;background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.2);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--green);">🔴 Live</div>
+        </div>
+        <div class="chart-tf-btns">
+          <button class="chart-tf-btn" onclick="setTF('1',this)">1m</button>
+          <button class="chart-tf-btn" onclick="setTF('5',this)">5m</button>
+          <button class="chart-tf-btn" onclick="setTF('15',this)">15m</button>
+          <button class="chart-tf-btn on" onclick="setTF('60',this)">1H</button>
+          <button class="chart-tf-btn" onclick="setTF('240',this)">4H</button>
+          <button class="chart-tf-btn" onclick="setTF('D',this)">1D</button>
+          <button class="chart-tf-btn" onclick="setTF('W',this)">1W</button>
+        </div>
+      </div>
+      <div id="spotTVContainer" style="height:320px;"></div>
+    </div>
+    <div style="padding:0 14px 14px;">
+      <div class="trade-tabs">
+        <button class="trade-tab buy on" id="stBuy" onclick="setSpotSide('buy')">▲ BUY</button>
+        <button class="trade-tab sell" id="stSell" onclick="setSpotSide('sell')">▼ SELL</button>
+      </div>
+      <div class="trade-input-wrap">
+        <input type="number" id="spotAmt" placeholder="Amount (USD)" oninput="calcSpotSummary()">
+        <div class="trade-input-sfx">USD</div>
+      </div>
+      <div id="spotSummary" style="background:#111;border:1px solid #1a1a1a;border-radius:var(--r);padding:12px;margin-bottom:12px;font-size:12px;color:var(--text2);display:none;"></div>
+      <button class="trade-execute-btn teb-buy" id="spotExecBtn" onclick="placeSpotTrade()">▲ BUY BTC/USDT</button>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <button class="bn-item" onclick="navTo('L_dash')"><span class="bn-ico">📊</span><span class="bn-lbl">Dashboard</span></button>
+    <button class="bn-item" onclick="navTo('L_wallet')"><span class="bn-ico">💼</span><span class="bn-lbl">Wallet</span></button>
+    <button class="bn-item" onclick="navTo('L_bots')"><span class="bn-ico">🤖</span><span class="bn-lbl">Bots</span></button>
+    <button class="bn-item on" onclick="navTo('L_spot')"><span class="bn-ico">📈</span><span class="bn-lbl">Trade</span></button>
+    <button class="bn-item" onclick="openDrawer()"><span class="bn-ico">☰</span><span class="bn-lbl">Menu</span></button>
+  </div>
+</div>
+
+<!-- LAYER: PRICE SPREAD -->
+<div id="L_spread" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Price Spread Trading</div>
+    <button class="nav-bell"><span>🔔</span></button>
+  </nav>
+  <div class="wrap">
+    <div style="background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);padding:14px;margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--green);margin-bottom:4px;" id="spreadBal">$0.00</div>
+      <div style="font-size:11px;color:var(--text2);">Available Balance</div>
+    </div>
+    <div class="spread-tabs">
+      <button class="spread-tab on" onclick="filterSpread('market',this)">Market</button>
+      <button class="spread-tab" onclick="filterSpread('active',this)">Active (0)</button>
+      <button class="spread-tab" onclick="filterSpread('history',this)">History</button>
+    </div>
+    <div style="background:#1a1a1a;border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <span>🔍</span>
+      <input type="text" placeholder="Search coins..." style="background:transparent;border:none;color:#fff;font-size:13px;outline:none;flex:1;font-family:var(--font);">
+    </div>
+    <div id="spreadList"></div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: HISTORY -->
+<div id="L_history" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Transaction History</div>
+    <div style="width:36px;"></div>
+  </nav>
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div class="card" style="text-align:center;"><div style="font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;">Total P/L</div><div id="histPL" style="font-family:var(--mono);font-size:16px;font-weight:800;">$0.00</div></div>
+      <div class="card" style="text-align:center;"><div style="font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;">Win Rate</div><div id="histWR" style="font-family:var(--mono);font-size:16px;font-weight:800;color:var(--teal);">—</div></div>
+      <div class="card" style="text-align:center;"><div style="font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;">Trades</div><div id="histTotal" style="font-family:var(--mono);font-size:16px;font-weight:800;">0</div></div>
+    </div>
+    <div id="histList"></div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: REFERRAL -->
+<div id="L_referral" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Earn Rewards</div>
+    <div style="width:36px;"></div>
+  </nav>
+  <div class="wrap">
+    <div class="ref-hero">
+      <div style="font-size:40px;margin-bottom:10px;">🎁</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Referral Program</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.6);">Earn <strong style="color:var(--green);">10% lifetime commission</strong> on every deposit your referrals make.</div>
+    </div>
+    <div class="ref-stats">
+      <div class="ref-stat"><div class="ref-stat-val" id="refCount">0</div><div class="ref-stat-lbl">Referrals</div></div>
+      <div class="ref-stat"><div class="ref-stat-val" id="refEarned">$0</div><div class="ref-stat-lbl">Earned</div></div>
+      <div class="ref-stat"><div class="ref-stat-val" style="color:var(--yellow);">10%</div><div class="ref-stat-lbl">Rate</div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:10px;">Your Referral Link</div>
+      <div class="ref-link-box" id="refLinkBox">—</div>
+      <button class="btn-primary" onclick="copyRefLink()" style="margin-bottom:12px;">📋 Copy Referral Link</button>
+      <div class="share-btns">
+        <button class="share-btn sb-wa" onclick="shareRef('wa')">💬 WhatsApp</button>
+        <button class="share-btn sb-tg" onclick="shareRef('tg')">✈️ Telegram</button>
+        <button class="share-btn sb-tw" onclick="shareRef('tw')">🐦 Twitter</button>
+        <button class="share-btn sb-fb" onclick="shareRef('fb')">📘 Facebook</button>
+      </div>
+    </div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: PROFILE/SECURITY -->
+<div id="L_profile" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Security</div>
+    <div style="width:36px;"></div>
+  </nav>
+  <div class="wrap">
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar" id="profAvatar">W</div>
+      <div class="profile-name" id="profName">—</div>
+      <div class="profile-email" id="profEmail">—</div>
+      <div class="profile-joined" id="profJoined">—</div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:16px;">⚙️ Edit Profile</div>
+      <form onsubmit="return doUpdateProfile(event)">
+        <div class="fg"><label>Full Name</label><input type="text" id="prName" required></div>
+        <div class="fg"><label>Phone</label><input type="tel" id="prPhone"></div>
+        <div class="fg"><label>New Password <span style="color:#555;font-weight:400;">(leave blank to keep)</span></label><div class="pw-wrap"><input type="password" id="prPw" placeholder="New password"><button type="button" class="pw-eye" onclick="togglePw('prPw',this)">👁</button></div></div>
+        <button type="submit" class="btn-primary">💾 Save Changes</button>
+      </form>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;">🔐 Account Info</div>
+      <div style="font-size:12px;color:var(--text2);line-height:2.2;">
+        Referral Code: <span style="font-family:var(--mono);color:var(--blue);font-weight:700;" id="profRefCode">—</span><br>
+        KYC Status: <span style="color:var(--yellow);">Pending Verification</span>
+      </div>
+    </div>
+    <button class="btn-danger" onclick="if(confirm('Logout?'))doLogout()">🚪 Sign Out</button>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: SETTINGS -->
+<div id="L_settings" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Settings</div>
+    <div style="width:36px;"></div>
+  </nav>
+  <div class="wrap">
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:14px;">🔔 Notifications</div>
+      <div id="notifSettings"></div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:14px;">⚡ Trading</div>
+      <div id="tradingPrefs"></div>
+    </div>
+    <div class="card" style="margin-bottom:14px;border-color:rgba(255,23,68,.2);">
+      <div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:14px;">⚠️ Danger Zone</div>
+      <button class="btn-danger" onclick="if(confirm('Delete account? Irreversible!'))deleteAccount()">🗑 Delete My Account</button>
+    </div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- LAYER: SUPPORT -->
+<div id="L_support" class="layer">
+  <nav class="nav">
+    <button class="nav-menu-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div style="font-size:15px;font-weight:700;">Support</div>
+    <div style="width:36px;"></div>
+  </nav>
+  <div class="wrap">
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:14px;font-weight:700;">🤖 AI Support Assistant</div>
+        <div style="display:flex;align-items:center;gap:5px;background:rgba(0,200,83,.08);border:1px solid rgba(0,200,83,.2);border-radius:20px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--green);">
+          <div style="width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 1.4s infinite;"></div>Online
+        </div>
+      </div>
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chatInput" placeholder="Ask me anything…" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="chat-send" id="chatSendBtn" onclick="sendChat()">Send</button>
+      </div>
+      <div class="quick-replies" id="chatQR"></div>
+    </div>
+    <a href="https://wa.me/254759401893" target="_blank" class="contact-card cc-wa">
+      <div class="cc-icon">💬</div>
+      <div><div class="cc-title" style="color:#25D366;">WhatsApp Admin</div><div class="cc-sub">+254 759 401 893 · Fastest response</div></div>
+    </a>
+    <div class="contact-card cc-email">
+      <div class="cc-icon">📧</div>
+      <div><div class="cc-title">Email Support</div><div class="cc-sub">support@cryptopro.trade</div></div>
+    </div>
+    <div class="card"><div style="font-size:14px;font-weight:700;margin-bottom:12px;">❓ FAQ</div><div id="faqList"></div></div>
+  </div>
+  <div class="wa-float"><a href="https://wa.me/254759401893" target="_blank">💬</a></div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-overlay" id="adminOverlay">
+  <nav class="admin-nav">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:30px;height:30px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#000;">₿</div>
+      <div><div style="font-size:14px;font-weight:800;color:var(--green);">CryptoPro Admin</div></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <span style="background:rgba(255,23,68,.1);border:1px solid rgba(255,23,68,.2);color:var(--red);padding:3px 8px;border-radius:20px;font-size:10px;font-weight:800;">🛡 ADMIN</span>
+      <button onclick="hideAdmin()" style="padding:6px 12px;background:#1a1a1a;border:none;border-radius:var(--r);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">← Site</button>
+      <button onclick="adminLogout()" style="padding:6px 12px;background:var(--red);border:none;border-radius:var(--r);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);">Logout</button>
+    </div>
+  </nav>
+  <div class="admin-tabs">
+    <button class="admin-tab on" onclick="showAP('ap_dash',this)">📊 Dashboard</button>
+    <button class="admin-tab" onclick="showAP('ap_deps',this)">💰 Deposits</button>
+    <button class="admin-tab" onclick="showAP('ap_wds',this)">💸 Withdrawals</button>
+    <button class="admin-tab" onclick="showAP('ap_users',this)">👥 Users</button>
+    <button class="admin-tab" onclick="showAP('ap_manual',this)">🔧 Credit</button>
+    <button class="admin-tab" onclick="showAP('ap_logs',this)">📋 Logs</button>
+  </div>
+  <div class="admin-body">
+    <div class="ap active" id="ap_dash">
+      <div style="font-size:17px;font-weight:800;margin-bottom:12px;">📊 Overview</div>
+      <div class="a-stat-grid" id="adminStats"></div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:10px;">⚡ Pending Deposits</div>
+      <div id="adminPendDeps"></div>
+      <div style="font-size:14px;font-weight:700;margin:14px 0 10px;">🆕 Recent Signups</div>
+      <div id="adminRecentUsers"></div>
+    </div>
+    <div class="ap" id="ap_deps">
+      <div style="font-size:17px;font-weight:800;margin-bottom:12px;">💰 Deposit Requests</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <input style="flex:1;min-width:120px;padding:8px 12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:#fff;font-size:12px;font-family:var(--font);" id="depSrch" placeholder="🔍 Search…" oninput="renderDeps()">
+        <select style="padding:8px 12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:#fff;font-size:12px;font-family:var(--font);" id="depFilt" onchange="renderDeps()">
+          <option value="all">All</option><option value="pending">Pending</option><option value="credited">Credited</option><option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div id="depsList"></div>
+    </div>
+    <div class="ap" id="ap_wds">
+      <div style="font-size:17px;font-weight:800;margin-bottom:12px;">💸 Withdrawals</div>
+      <div id="wdsList"></div>
+    </div>
+    <div class="ap" id="ap_users">
+      <div style="font-size:17px;font-weight:800;margin-bottom:12px;">👥 All Users</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input style="flex:1;padding:8px 12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:#fff;font-size:12px;font-family:var(--font);" id="usrSrch" placeholder="🔍 Search…" oninput="renderUsers()">
+      </div>
+      <div id="usersList"></div>
+    </div>
+    <div class="ap" id="ap_manual">
+      <div style="font-size:17px;font-weight:800;margin-bottom:12px;">🔧 Manual Credit</div>
+      <div class="card" style="margin-bottom:14px;">
+        <div class="a-form">
+          <label>User Email</label><input type="email" id="manEmail" placeholder="user@email.com">
+          <label>Account Type</label>
+          <select id="manType"><option value="real">Real Account</option><option value="demo">Demo Account</option></select>
+          <label>Amount (USD) — negative to deduct</label><input type="number" id="manAmt" placeholder="e.g. 500 or -50">
+          <label>Note</label><input type="text" id="manNote" placeholder="e.g. Welcome bonus">
+          <button class="abtn-submit" onclick="doManualCredit()">Apply</button>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Recent Adjustments</div>
+      <div id="adjLog"></div>
+    </div>
+    <div class="ap" id="ap_logs">
+      <div style="font-size:17px;font-weight:800;margin-bottom:12px;">📋 Activity Logs</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input style="flex:1;padding:8px 12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:var(--r);color:#fff;font-size:12px;font-family:var(--font);" id="logSrch" placeholder="🔍 Filter…" oninput="renderLogs()">
+        <button onclick="AD.logs=[];saveAD();renderLogs();" style="padding:8px 12px;background:rgba(255,23,68,.1);border:1px solid rgba(255,23,68,.2);border-radius:var(--r);color:var(--red);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">Clear</button>
+      </div>
+      <div id="logsEl"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  CryptoPro v6.0 — Updated Payment Addresses + AI Support
+// ══════════════════════════════════════════════════════════
+
+// ── DATA ──────────────────────────────────────────────────
+const USERS=JSON.parse(localStorage.getItem('cpn_users')||'{}');
+const saveUsers=()=>localStorage.setItem('cpn_users',JSON.stringify(USERS));
+const AD={
+  cfg:JSON.parse(localStorage.getItem('cpn_acfg')||'{"user":"admin","pw":"CryptoNexus2024!"}'),
+  deps:JSON.parse(localStorage.getItem('cpn_deps')||'[]'),
+  wds:JSON.parse(localStorage.getItem('cpn_wds')||'[]'),
+  adjs:JSON.parse(localStorage.getItem('cpn_adjs')||'[]'),
+  logs:JSON.parse(localStorage.getItem('cpn_logs')||'[]'),
+  in:false,
+};
+const saveAD=()=>{
+  localStorage.setItem('cpn_acfg',JSON.stringify(AD.cfg));
+  localStorage.setItem('cpn_deps',JSON.stringify(AD.deps));
+  localStorage.setItem('cpn_wds',JSON.stringify(AD.wds));
+  localStorage.setItem('cpn_adjs',JSON.stringify(AD.adjs));
+  localStorage.setItem('cpn_logs',JSON.stringify(AD.logs));
+};
+const appSettings=JSON.parse(localStorage.getItem('cpn_settings')||JSON.stringify({
+  notifTrades:true,notifDeposit:true,notifSignals:false,soundEffects:false,confirmOrders:true
+}));
+const saveSettings=()=>localStorage.setItem('cpn_settings',JSON.stringify(appSettings));
+
+// ── SESSION ───────────────────────────────────────────────
+const S={
+  user:null,
+  demo:{bal:30,pl:0},real:{bal:0,pl:0},
+  positions:[],history:[],
+  botActive:false,botSel:null,botInterval:null,
+  botCount:0,botWins:0,botPL:0,botTrades:[],
+  activeBots:[],
+  side:'buy',orderType:'market',
+  pending:null,pendingOrder:null,
+  depStep:1,depCrypto:'USDT',depWallet:'funding',depAmt:0,
+};
+
+// ── PAYMENT ADDRESSES ─────────────────────────────────────
+const DEP_ADDRESS_MAP={
+  BTC:'14DZxGVHNKaX6WkwhKwq66B31VoUUNfqYZ',
+  USDT:'TK4rUz6TUEd7zCWeuiX5R47pSNdPswJnAc',
+  ETH:'0xd4a2fd2b053cbe8d9c7cc2715173c61506f4833d',
+  BNB:'0xd4a2fd2b053cbe8d9c7cc2715173c61506f4833d',
+  SOL:'GSCQFHE66hF1NPg4vGgKZXwFwvqw1yFSzpPtfmNKPSP',
+};
+
+// ── PRICES ────────────────────────────────────────────────
+const PX={BTCUSDT:67418,ETHUSDT:2052,BNBUSDT:617,SOLUSDT:84,XRPUSDT:1.35,ADAUSDT:0.248,DOGEUSDT:0.0926,DOTUSDT:1.27,TRXUSDT:0.323,AVAXUSDT:38};
+const PX_CHG={BTCUSDT:1.35,ETHUSDT:2.83,BNBUSDT:0.74,SOLUSDT:2.23,XRPUSDT:1.13,ADAUSDT:1.55,DOGEUSDT:2.01,DOTUSDT:-0.13,TRXUSDT:0.92,AVAXUSDT:3.1};
+const PAIRS=['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','ADAUSDT','DOGEUSDT','DOTUSDT','TRXUSDT','AVAXUSDT'];
+const PAIR_NAMES={BTCUSDT:'Bitcoin',ETHUSDT:'Ethereum',BNBUSDT:'BNB',SOLUSDT:'Solana',XRPUSDT:'Ripple',ADAUSDT:'Cardano',DOGEUSDT:'Dogecoin',DOTUSDT:'Polkadot',TRXUSDT:'TRON',AVAXUSDT:'Avalanche'};
+const COIN_COLORS={BTCUSDT:'#f7931a',ETHUSDT:'#627eea',BNBUSDT:'#f3ba2f',SOLUSDT:'#9945ff',XRPUSDT:'#0085c0',ADAUSDT:'#0d1e2e',DOGEUSDT:'#c2a633',DOTUSDT:'#e6007a',TRXUSDT:'#cc0000',AVAXUSDT:'#e84142'};
+const COIN_ICONS={BTCUSDT:'₿',ETHUSDT:'Ξ',BNBUSDT:'B',SOLUSDT:'◎',XRPUSDT:'✕',ADAUSDT:'₳',DOGEUSDT:'Ð',DOTUSDT:'●',TRXUSDT:'T',AVAXUSDT:'A'};
+
+// ── DEPOSIT CRYPTOS ───────────────────────────────────────
+const DEP_CRYPTOS=[
+  {sym:'USDT',name:'Tether',net:'TRC20',min:30,icon:'🪙',color:'#26a17b'},
+  {sym:'BTC',name:'Bitcoin',net:'Bitcoin Network',min:0.0005,icon:'₿',color:'#f7931a'},
+  {sym:'ETH',name:'Ethereum',net:'ERC20',min:0.01,icon:'Ξ',color:'#627eea'},
+  {sym:'BNB',name:'BNB',net:'BSC (BEP20)',min:0.05,icon:'🟡',color:'#f3ba2f'},
+  {sym:'SOL',name:'Solana',net:'Solana Network',min:0.5,icon:'◎',color:'#9945ff'},
+];
+
+// ── UTILS ─────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const fmt=(n,d=2)=>parseFloat(n||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtPx=p=>{if(!p)return'—';if(p<0.001)return p.toFixed(6);if(p<1)return p.toFixed(4);if(p<100)return p.toFixed(3);return fmt(p,2);};
+const fmtM=n=>n>=1e9?(n/1e9).toFixed(2)+'B':n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(0)+'K':fmt(n,0);
+const rnd=(a,b)=>Math.random()*(b-a)+a;
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const nowStr=()=>new Date().toLocaleString('en-GB',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short',year:'numeric'});
+const tsStr=()=>new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const alog=msg=>{AD.logs.unshift({t:nowStr(),m:msg});if(AD.logs.length>200)AD.logs.pop();saveAD();};
+
+function showToast(msg,type='ok',dur=4000){
+  const t=$('toast');t.textContent=msg;t.className=type+' show';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
+}
+function copyText(txt){navigator.clipboard.writeText(txt).catch(()=>{});showToast('📋 Copied!','ok',2000);}
+function openModal(id){$(id).classList.add('open');}
+function closeModal(id){$(id).classList.remove('open');}
+function togglePw(id,btn){const el=$(id);el.type=el.type==='password'?'text':'password';btn.textContent=el.type==='text'?'🙈':'👁';}
+
+// ── DRAWER ────────────────────────────────────────────────
+function openDrawer(){
+  if(!S.user){showLayer('L_login');return;}
+  $('sideDrawer').classList.add('open');
+  $('drawerOverlay').classList.add('open');
+  if(S.user){
+    $('drawerAvatar').textContent=S.user.name[0].toUpperCase();
+    $('drawerName').innerHTML=S.user.name+' <span class="drawer-online"></span>';
+    $('drawerEmail').textContent=S.user.email;
+  }
+}
+function closeDrawer(){$('sideDrawer').classList.remove('open');$('drawerOverlay').classList.remove('open');}
+
+// ── ROUTING ───────────────────────────────────────────────
+const PROTECTED=['L_dash','L_wallet','L_deposit','L_withdraw','L_bots','L_spot','L_spread','L_history','L_referral','L_profile','L_settings','L_support'];
+
+function showLayer(id){
+  document.querySelectorAll('.layer').forEach(l=>l.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0,0);
+  onEnter(id);
+}
+function navTo(id){
+  if(PROTECTED.includes(id)&&!S.user){showToast('Please login first.','err');showLayer('L_login');return;}
+  showLayer(id);
+}
+function onEnter(id){
+  buildTicker();
+  if(id==='L_welcome')buildWelcome();
+  if(id==='L_dash'){buildDash();buildPriceGrid();}
+  if(id==='L_wallet')buildWallet();
+  if(id==='L_deposit')initDeposit();
+  if(id==='L_withdraw')buildWithdraw();
+  if(id==='L_bots')buildBotsList();
+  if(id==='L_spot')buildSpotList();
+  if(id==='L_spread')buildSpreadList();
+  if(id==='L_history')buildHistory();
+  if(id==='L_referral')buildReferral();
+  if(id==='L_profile')loadProfile();
+  if(id==='L_settings')buildSettings();
+  if(id==='L_support')initSupport();
+}
+
+// ── TICKER ────────────────────────────────────────────────
+function buildTicker(){
+  ['wTicker','dTicker'].forEach(id=>{
+    const el=$(id);if(!el)return;
+    const html=PAIRS.map(p=>{const c=PX_CHG[p]||0,up=c>=0;
+      return`<span class="tick-item"><span class="tick-sym">${p.replace('USDT','')}</span><span class="tick-px">$${fmtPx(PX[p])}</span><span class="tick-chg ${up?'tick-up':'tick-dn'}">${up?'+':''}${parseFloat(c).toFixed(2)}%</span></span>`;
+    }).join('');
+    el.innerHTML=html+html;
+  });
+}
+
+// ── PRICE SIMULATION ──────────────────────────────────────
+function simPrices(){
+  PAIRS.forEach(p=>{
+    const move=(Math.random()-.499)*PX[p]*.0006;
+    PX[p]=Math.max(.001,parseFloat((PX[p]+move).toFixed(PX[p]<1?4:2)));
+    PX_CHG[p]=parseFloat((parseFloat(PX_CHG[p]||0)+(Math.random()-.499)*.03).toFixed(2));
+  });
+  buildTicker();updatePriceGrid();
+}
+setInterval(simPrices,2500);
+
+// ── WELCOME ───────────────────────────────────────────────
+function buildWelcome(){
+  const feats=[
+    {ico:'🤖',t:'Trading Bots',d:'25 automated bots across 6 tiers. Win rates up to 50%.'},
+    {ico:'📊',t:'Live Charts',d:'Real TradingView charts with 100+ indicators.'},
+    {ico:'⇄',t:'Price Spread Trading',d:'Buy/sell coins with spread opportunities.'},
+    {ico:'💼',t:'Dual Wallet',d:'Separate Spot and Funding wallets.'},
+    {ico:'🎁',t:'Referral Rewards',d:'Earn 10% commission on all referral deposits.'},
+    {ico:'🔐',t:'Secure & Fast',d:'Withdrawals processed within 5-30 minutes.'},
+  ];
+  const el=$('wFeatGrid');if(!el)return;
+  el.innerHTML=feats.map(f=>`<div class="card"><div style="font-size:26px;margin-bottom:8px;">${f.ico}</div><div style="font-size:13px;font-weight:700;margin-bottom:4px;">${f.t}</div><div style="font-size:12px;color:var(--text2);line-height:1.6;">${f.d}</div></div>`).join('');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function buildDash(){
+  if(!S.user)return;
+  const total=S.real.bal+S.demo.bal;
+  const wins=S.history.filter(t=>t.result==='WIN').length;
+  const wr=S.history.length?(wins/S.history.length*100).toFixed(1)+'%':'0%';
+  if($('dashPortfolio'))$('dashPortfolio').textContent='$'+fmt(total,2);
+  if($('dashTrades'))$('dashTrades').textContent=S.history.length;
+  if($('dashWR'))$('dashWR').textContent=wr;
+  const ab=$('dashActiveBots');
+  if(ab){
+    if(S.activeBots.length){
+      ab.innerHTML=S.activeBots.map(b=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#111;border:1px solid #1a1a1a;border-radius:var(--r2);margin-bottom:8px;"><div style="display:flex;align-items:center;gap:10px;"><div style="width:36px;height:36px;background:${b.bg};border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;">🤖</div><div><div style="font-size:13px;font-weight:700;">${b.name}</div><div style="font-size:11px;color:var(--text2);">Running • ${b.mode.toUpperCase()}</div></div></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:14px;font-weight:800;color:${b.pl>=0?'var(--green)':'var(--red)'};">${b.pl>=0?'+':''}$${fmt(b.pl,2)}</div><button onclick="stopBotById('${b.id}')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;margin-top:2px;">Stop</button></div></div>`).join('');
+    }else{
+      ab.innerHTML='<div style="font-size:12px;color:var(--text2);padding:12px 0;text-align:center;">No active bots. <a style="color:var(--green);cursor:pointer;" onclick="navTo(\'L_bots\')">Start a bot →</a></div>';
+    }
+  }
+  const dr=$('dashRecent');
+  if(dr){
+    if(S.history.length){
+      dr.innerHTML=S.history.slice(0,5).map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:12px;"><div><div style="font-weight:700;">${t.pair.replace('USDT','/USDT')} <span style="color:${t.side==='buy'?'var(--green)':'var(--red)'};">${t.side==='buy'?'▲':'▼'}</span></div><div style="font-size:10px;color:var(--text2);margin-top:2px;">${t.time}</div></div><div style="font-family:var(--mono);font-weight:800;color:${t.pnl>=0?'var(--green)':'var(--red)'};">${t.pnl>=0?'+':''}$${fmt(t.pnl,2)}</div></div>`).join('');
+    }else{
+      dr.innerHTML='<div style="font-size:12px;color:var(--text2);padding:12px 0;text-align:center;">No trades yet. <a style="color:var(--green);cursor:pointer;" onclick="navTo(\'L_bots\')">Start trading →</a></div>';
+    }
+  }
+}
+function buildPriceGrid(){
+  const el=$('dashPriceGrid');if(!el)return;
+  el.innerHTML=PAIRS.map(p=>{const c=parseFloat(PX_CHG[p]||0),up=c>=0;
+    return`<div class="price-card"><div class="price-sym">${p.replace('USDT','')}</div><div class="price-val" id="dpx_${p}">$${fmtPx(PX[p])}</div><div class="price-chg ${up?'up':'dn'}" id="dchg_${p}">${up?'+':''}${c.toFixed(2)}%</div></div>`;
+  }).join('');
+}
+function updatePriceGrid(){
+  PAIRS.forEach(p=>{
+    const pEl=$(`dpx_${p}`),cEl=$(`dchg_${p}`);
+    if(pEl)pEl.textContent='$'+fmtPx(PX[p]);
+    if(cEl){const c=parseFloat(PX_CHG[p]||0),up=c>=0;cEl.textContent=(up?'+':'')+c.toFixed(2)+'%';cEl.className='price-chg '+(up?'up':'dn');}
+  });
+}
+
+// ── WALLET ────────────────────────────────────────────────
+function buildWallet(){
+  if(!S.user)return;
+  const total=S.real.bal+S.demo.bal;
+  if($('walletTotal'))$('walletTotal').textContent='$'+fmt(total,2);
+  if($('walletUSDT'))$('walletUSDT').textContent='≈ '+fmt(total,2)+' USDT';
+  if($('spotBal'))$('spotBal').textContent='$'+fmt(S.demo.bal,2);
+  if($('fundBal'))$('fundBal').textContent='$'+fmt(S.real.bal,2);
+  const el=$('cryptoAssets');
+  if(el){
+    const assets=[
+      {sym:'BTC',name:'Bitcoin',price:PX.BTCUSDT,chg:PX_CHG.BTCUSDT,col:'#f7931a',bg:'#1a0e00'},
+      {sym:'ETH',name:'Ethereum',price:PX.ETHUSDT,chg:PX_CHG.ETHUSDT,col:'#627eea',bg:'#001040'},
+      {sym:'USDT',name:'Tether USD',price:1,chg:0,col:'#26a17b',bg:'#001a0d'},
+      {sym:'BNB',name:'BNB',price:PX.BNBUSDT,chg:PX_CHG.BNBUSDT,col:'#f3ba2f',bg:'#1a0e00'},
+      {sym:'SOL',name:'Solana',price:PX.SOLUSDT,chg:PX_CHG.SOLUSDT,col:'#9945ff',bg:'#1a0020'},
+    ];
+    el.innerHTML=assets.map(a=>{const up=parseFloat(a.chg||0)>=0;
+      return`<div class="crypto-asset" style="background:${a.bg};border:1px solid rgba(255,255,255,.05);">
+        <div class="ca-header">
+          <div class="ca-left"><div class="ca-icon" style="background:${a.col}22;color:${a.col};font-weight:800;">${a.sym[0]}</div><div><div class="ca-sym">${a.sym}</div><div class="ca-name">${a.name}</div></div></div>
+          <div class="ca-right"><div class="ca-price">$${fmtPx(a.price)}</div><div class="ca-chg" style="color:${up?'var(--green)':'var(--red)'};">${up?'↑':'↓'} ${Math.abs(parseFloat(a.chg||0)).toFixed(2)}%</div></div>
+        </div>
+        <div class="ca-body">
+          <div class="ca-row"><div class="ca-row-lbl"><span class="ca-dot" style="background:#f59e0b;"></span>Spot</div><div class="ca-row-val">0.00000000 ${a.sym}</div></div>
+          <div class="ca-row"><div class="ca-row-lbl"><span class="ca-dot" style="background:#3b82f6;"></span>Funding</div><div class="ca-row-val">0.00000000 ${a.sym}</div></div>
+        </div>
+        <div class="ca-est"><span class="ca-est-lbl">Est. Value</span><span class="ca-est-val">$0.00</span></div>
+        <div class="ca-actions">
+          <button class="ca-dep-btn" onclick="navTo('L_deposit')">+ Deposit</button>
+          <button class="ca-wd-btn" onclick="navTo('L_withdraw')">— Withdraw</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  const txns=AD.deps.filter(d=>d.email===S.user?.email);
+  const txnEl=$('txnList');const txnCnt=$('txnCount');
+  if(txnCnt)txnCnt.textContent=txns.length+' total';
+  if(txnEl){
+    if(!txns.length){
+      txnEl.innerHTML=`<div class="txn-empty"><div class="txn-empty-icon">🕐</div><div class="txn-empty-txt">No transactions yet</div><button class="make-deposit-btn" onclick="navTo('L_deposit')">Make Your First Deposit</button></div>`;
+    }else{
+      txnEl.innerHTML=txns.map(d=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a1a1a;font-size:12px;"><div><div style="font-weight:700;">Deposit via ${d.method}</div><div style="font-size:10px;color:var(--text2);margin-top:2px;">${d.submittedAt}</div></div><div style="text-align:right;"><div style="font-family:var(--mono);font-weight:700;color:var(--green);">+$${fmt(d.amt,2)}</div><span class="s-badge s-${d.status}">${d.status}</span></div></div>`).join('');
+    }
+  }
+}
+function refreshWallet(){buildWallet();showToast('Wallet refreshed','ok',1500);}
+
+// ── AUTH ──────────────────────────────────────────────────
+function genRef(n){return n.substr(0,3).toUpperCase()+Math.floor(Math.random()*9000+1000);}
+
+function doSignup(e){
+  e.preventDefault();
+  const name=$('sName').value.trim(),email=$('sEmail').value.trim().toLowerCase();
+  const phone=$('sPhone').value.trim(),pw=$('sPw').value,pw2=$('sPw2').value,ref=$('sRef').value.trim();
+  const er=$('sErr');er.style.display='none';
+  if(pw!==pw2){er.textContent='Passwords do not match!';er.style.display='block';return false;}
+  if(pw.length<6){er.textContent='Password min 6 characters.';er.style.display='block';return false;}
+  if(USERS[email]){er.textContent='Email already registered!';er.style.display='block';return false;}
+  const refCode=genRef(name);
+  USERS[email]={name,email,phone,pw,refCode,referredBy:ref||null,registeredAt:nowStr(),deposits:0,demo:{bal:30,pl:0},real:{bal:0,pl:0},pending:null};
+  if(ref){const ru=Object.values(USERS).find(u=>u.refCode===ref.toUpperCase());if(ru)ru.demo.bal=parseFloat((ru.demo.bal+15).toFixed(2));}
+  saveUsers();alog(`Signup: ${name} (${email})`);
+  loginUser(USERS[email]);showToast(`🎉 Welcome ${name}! $30 demo bonus credited!`);
+  return false;
+}
+
+function doLogin(e){
+  e.preventDefault();
+  const email=$('lEmail').value.trim().toLowerCase(),pw=$('lPw').value;
+  const er=$('lErr');er.style.display='none';
+  if((email===AD.cfg.user||email==='admin')&&pw===AD.cfg.pw){showAdminPanel();return false;}
+  const u=USERS[email];
+  if(!u||u.pw!==pw){er.textContent='Invalid email or password.';er.style.display='block';return false;}
+  loginUser(u);showToast(`👋 Welcome back, ${u.name}!`);
+  return false;
+}
+function loginUser(u){
+  S.user=u;
+  S.demo={bal:u.demo?.bal||30,pl:u.demo?.pl||0};
+  S.real={bal:u.real?.bal||0,pl:u.real?.pl||0};
+  S.pending=u.pending||null;
+  showLayer('L_dash');
+}
+function doLogout(){
+  saveCurrentUser();S.user=null;S.positions=[];S.history=[];S.botActive=false;
+  S.activeBots=[];clearInterval(S.botInterval);
+  showLayer('L_welcome');showToast('Signed out.','info');
+}
+function saveCurrentUser(){
+  if(!S.user)return;
+  const u=USERS[S.user.email];if(!u)return;
+  u.demo={bal:S.demo.bal,pl:S.demo.pl};u.real={bal:S.real.bal,pl:S.real.pl};saveUsers();
+}
+
+// ── DEPOSIT (4-step) ──────────────────────────────────────
+let depTimerInterval=null;
+
+function initDeposit(){
+  S.depStep=1;renderDepStep();
+  buildDepCryptoList();buildDepStepIndicator();
+}
+function buildDepStepIndicator(){
+  const el=$('depStepIndicator');if(!el)return;
+  const steps=[1,2,3,4];
+  el.innerHTML=steps.map((s,i)=>{
+    const cls=s<S.depStep?'done':s===S.depStep?'active':'inactive';
+    const line=i<steps.length-1?`<div class="dep-step-line ${s<S.depStep?'done':''}"></div>`:'';
+    return`<div class="dep-step ${cls}">${s<S.depStep?'✓':s}</div>${line}`;
+  }).join('');
+}
+function renderDepStep(){
+  [1,2,3,4].forEach(n=>$(`depStep${n}`).style.display=n===S.depStep?'block':'none');
+  const back=$('depBackBtn'),next=$('depNextBtn'),nav=$('depNavBtns');
+  if(S.depStep===1){back.style.display='none';next.textContent='Continue →';}
+  else if(S.depStep===2){back.style.display='flex';next.textContent='Continue →';}
+  else if(S.depStep===3){back.style.display='flex';next.textContent='I Have Paid';}
+  else{nav.style.display='none';}
+  buildDepStepIndicator();
+}
+function buildDepCryptoList(){
+  const el=$('depCryptoList');if(!el)return;
+  el.innerHTML=DEP_CRYPTOS.map(c=>`
+    <div class="dep-crypto-item ${S.depCrypto===c.sym?'on':''}" onclick="selDepCrypto('${c.sym}',this)">
+      <div class="dep-crypto-left">
+        <div class="dep-crypto-icon" style="background:${c.color}22;color:${c.color};font-size:22px;">${c.icon}</div>
+        <div>
+          <div class="dep-crypto-sym">${c.sym}</div>
+          <div class="dep-crypto-net">${c.name} · ${c.net}</div>
+          <div class="dep-crypto-min">Min: ${c.min} ${c.sym}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="dep-net-tag">${c.net}</span>
+        <div class="dep-radio"></div>
+      </div>
+    </div>
+  `).join('');
+}
+function selDepCrypto(sym,el){
+  S.depCrypto=sym;
+  document.querySelectorAll('.dep-crypto-item').forEach(i=>i.classList.remove('on'));
+  el.classList.add('on');
+}
+function buildDepStep2(){
+  const c=DEP_CRYPTOS.find(x=>x.sym===S.depCrypto)||DEP_CRYPTOS[0];
+  if($('depStep2Sub'))$('depStep2Sub').textContent=`Depositing ${c.sym} via ${c.net}`;
+  if($('depSelCryptoShow'))$('depSelCryptoShow').innerHTML=`<div style="width:40px;height:40px;border-radius:50%;background:${c.color}22;color:${c.color};font-size:22px;display:flex;align-items:center;justify-content:center;">${c.icon}</div><div><div style="font-size:14px;font-weight:700;">${c.sym}</div><div style="font-size:11px;color:var(--text2);">${c.name} · ${c.net}</div></div>`;
+  if($('depMinNote'))$('depMinNote').textContent=`Minimum deposit: ${c.min} ${c.sym}`;
+  if($('depAmtInput'))$('depAmtInput').placeholder=`Min: ${c.min} ${c.sym}`;
+  const ws=$('depWalletSelect');
+  if(ws)ws.innerHTML=[
+    {id:'funding',icon:'💳',label:'Funding Wallet',sub:'For storage & withdrawals'},
+    {id:'spot',icon:'💼',label:'Spot Wallet',sub:'For trading & bots'},
+  ].map(w=>`<div class="ws-card ${w.id==='funding'?'ws-fund':'ws-spot'} ${S.depWallet===w.id?'on':''}" onclick="selDepWallet('${w.id}',this)"><div class="ws-icon">${w.icon}</div><div class="ws-label">${w.label}</div><div class="ws-sub">${w.sub}</div></div>`).join('');
+}
+function selDepWallet(id,el){S.depWallet=id;document.querySelectorAll('.ws-card').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+
+function buildDepStep3(){
+  const amt=parseFloat($('depAmtInput')?.value||30);
+  S.depAmt=amt;
+  const c=DEP_CRYPTOS.find(x=>x.sym===S.depCrypto)||DEP_CRYPTOS[0];
+  const addr=DEP_ADDRESS_MAP[S.depCrypto]||DEP_ADDRESS_MAP.USDT;
+  clearInterval(depTimerInterval);let t=30*60;
+  const te=$('depTimer');
+  const updateTimer=()=>{const m=Math.floor(t/60),s=t%60;if(te)te.textContent=`⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;if(--t<0){clearInterval(depTimerInterval);if(te)te.textContent='⏱ EXPIRED';}};
+  updateTimer();depTimerInterval=setInterval(updateTimer,1000);
+  if($('depAddrLabel'))$('depAddrLabel').textContent=`${c.sym} Deposit Address (${c.net})`;
+  if($('depAddressBox'))$('depAddressBox').textContent=addr;
+  if($('depNoticeNet'))$('depNoticeNet').textContent=`Network must match: ${c.net}`;
+  if($('depStep3Info'))$('depStep3Info').innerHTML=[
+    ['Amount',`$${fmt(amt,2)}`],
+    ['Crypto',c.sym],
+    ['Network',c.net],
+    ['Destination',S.depWallet==='spot'?'Spot Wallet':'Funding Wallet'],
+  ].map(([k,v])=>`<div class="dep-info-row"><span class="dep-info-lbl">${k}</span><span class="dep-info-val">${v}</span></div>`).join('');
+}
+function copyDepAddress(){
+  const addr=DEP_ADDRESS_MAP[S.depCrypto]||DEP_ADDRESS_MAP.USDT;
+  copyText(addr);
+}
+function depNext(){
+  if(S.depStep===1){if(!S.depCrypto){showToast('Select a cryptocurrency.','err');return;}S.depStep=2;buildDepStep2();renderDepStep();}
+  else if(S.depStep===2){const amt=parseFloat($('depAmtInput')?.value||0);if(amt<30){showToast('Minimum 30 USDT equivalent.','err');return;}S.depStep=3;buildDepStep3();renderDepStep();}
+  else if(S.depStep===3){submitDeposit();}
+}
+function depBack(){if(S.depStep>1){S.depStep--;renderDepStep();if(S.depStep===2)buildDepStep2();}}
+
+function submitDeposit(){
+  if(!S.user){showToast('Login first.','err');return;}
+  const amt=S.depAmt||parseFloat($('depAmtInput')?.value||30);
+  const c=DEP_CRYPTOS.find(x=>x.sym===S.depCrypto)||DEP_CRYPTOS[0];
+  const addr=DEP_ADDRESS_MAP[S.depCrypto]||DEP_ADDRESS_MAP.USDT;
+  const depObj={amt,method:S.depCrypto,wallet:S.depWallet,proof:'Payment submitted via app',submittedAt:nowStr()};
+  S.pending=depObj;
+  const u=USERS[S.user.email];if(u){u.pending=depObj;saveUsers();}
+  AD.deps.push({id:'D'+Date.now(),name:S.user.name,email:S.user.email,phone:S.user.phone,amt,method:S.depCrypto+' ('+c.net+')',proof:'App deposit',submittedAt:nowStr(),status:'pending',creditedAmt:0,bonus:0});
+  saveAD();alog(`Deposit: ${S.user.email} $${amt} via ${S.depCrypto}`);
+  const msg=`🔔 *New Deposit Request*\n\n👤 Name: ${S.user.name}\n📧 Email: ${S.user.email}\n📱 Phone: ${S.user.phone||'—'}\n💵 Amount: $${fmt(amt,2)}\n🪙 Crypto: ${S.depCrypto} (${c.net})\n📍 Wallet: ${S.depWallet}\n📬 Address: ${addr}\n⏰ Time: ${nowStr()}`;
+  setTimeout(()=>window.open(`https://wa.me/254759401893?text=${encodeURIComponent(msg)}`,'_blank'),800);
+  clearInterval(depTimerInterval);
+  S.depStep=4;renderDepStep();
+  if($('depSuccessMsg'))$('depSuccessMsg').textContent=`$${fmt(amt,2)} ${S.depCrypto} deposit submitted to your ${S.depWallet} wallet. Admin will credit your account within 10 minutes after verification. Send your payment proof on WhatsApp for faster processing.`;
+}
+function updateDepFX(){
+  const amt=parseFloat($('depAmtInput')?.value||0);
+  const box=$('depFXBox');
+  if(amt>0&&box){box.style.display='block';if($('depFXUSD'))$('depFXUSD').textContent='$'+fmt(amt,2);if($('depFXLocal'))$('depFXLocal').textContent='KES '+fmt(amt*130,0);}
+  else if(box)box.style.display='none';
+}
+
+// ── WITHDRAWAL ────────────────────────────────────────────
+let selWdMeth=null;
+function buildWithdraw(){if($('wdBal'))$('wdBal').textContent='$'+fmt(S.real.bal,2);}
+function selWdMethod(m,el){
+  selWdMeth=m;
+  document.querySelectorAll('.wd-method').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+  ['mpesa','bank','usdt'].forEach(id=>{const d=$('wd-'+id);if(d)d.style.display=id===m?'block':'none';});
+}
+function calcWdFee(){
+  const amt=parseFloat($('wdAmt')?.value||0),box=$('wdFeeBox');
+  if(amt>0){if(box)box.style.display='block';const fee=amt*.02;if($('wfAmt'))$('wfAmt').textContent='$'+fmt(amt,2);if($('wfFee'))$('wfFee').textContent='-$'+fmt(fee,2);if($('wfNet'))$('wfNet').textContent='$'+fmt(amt-fee,2);}
+  else if(box)box.style.display='none';
+}
+function doWithdraw(e){
+  e.preventDefault();
+  if(!S.user){showToast('Login first.','err');return false;}
+  if(S.real.bal<50){showToast('Real balance must be at least $50.','err');return false;}
+  const amt=parseFloat($('wdAmt')?.value||0);
+  if(amt<50){showToast('Minimum $50.','err');return false;}
+  if(amt>S.real.bal){showToast('Insufficient balance.','err');return false;}
+  if(!selWdMeth){showToast('Select withdrawal method.','err');return false;}
+  let acct='—';
+  if(selWdMeth==='mpesa')acct=$('wdPhone')?.value||'—';
+  if(selWdMeth==='bank')acct=($('wdBank')?.value||'')+' '+($('wdBankAcc')?.value||'');
+  if(selWdMeth==='usdt')acct=$('wdUsdt')?.value||'—';
+  const fee=amt*.02,net=amt-fee;
+  S.real.bal=parseFloat((S.real.bal-amt).toFixed(2));
+  const u=USERS[S.user.email];if(u)u.real.bal=S.real.bal;
+  AD.wds.push({id:'W'+Date.now(),name:S.user.name,email:S.user.email,amt,method:selWdMeth,acct,ts:nowStr(),status:'pending'});
+  saveUsers();saveAD();alog(`Withdrawal: ${S.user.email} $${amt}`);
+  showToast(`💸 Withdrawal of $${fmt(net,2)} submitted!`,'ok',5000);
+  setTimeout(()=>{const msg=`💸 *Withdrawal Request*\n\n👤 ${S.user.name}\n💵 $${fmt(amt,2)}\n📍 ${selWdMeth}: ${acct}\n⏰ ${nowStr()}`;window.open(`https://wa.me/254759401893?text=${encodeURIComponent(msg)}`,'_blank');},1000);
+  navTo('L_wallet');return false;
+}
+
+// ── BOTS ──────────────────────────────────────────────────
+const BOTS_DATA=[
+  {tier:'T1',tierLabel:'Starter Bots',tierColor:'#ff6d00',tierBg:'rgba(255,109,0,.08)',description:'15-minute trades, 30 USDT minimum',
+   bots:[
+     {id:'spark',name:'Spark Engine',desc:'Ignite your portfolio quickly',pnl:'+50.00%',loss:'-12.00%',min:150,max:5000,runtime:'2h',traders:'44.5K',hot:true},
+     {id:'swift',name:'Swift Trader',desc:'Quick 15-minute trades for rapid gains',pnl:'+5.50%',loss:'-0.50%',min:30,max:5000,runtime:'15m',traders:'67.2K',hot:false},
+   ]},
+  {tier:'T2',tierLabel:'Bronze Bots',tierColor:'#cd7f32',tierBg:'rgba(205,127,50,.08)',description:'30-minute trades, 45 USDT minimum',
+   bots:[
+     {id:'titan',name:'Titan Force',desc:'Powerful institutional-grade strategies',pnl:'+5.00%',loss:'-1.00%',min:45,max:10000,runtime:'7h 30m',traders:'82.1K',hot:false},
+     {id:'marathon',name:'Marathon Runner',desc:'Long-term consistent profits',pnl:'+5.00%',loss:'-30.00%',min:100,max:5000,runtime:'5m',traders:'109.4K',hot:false},
+   ]},
+  {tier:'T3',tierLabel:'Silver Bots',tierColor:'#aaa',tierBg:'rgba(170,170,170,.08)',description:'1-hour trades, 100 USDT minimum',
+   bots:[
+     {id:'sentinel',name:'Crypto Sentinel',desc:'Guardian of your investments',pnl:'+11.00%',loss:'-4.50%',min:450,max:5000,runtime:'12h',traders:'4671K',hot:true},
+     {id:'nightowl',name:'Night Owl',desc:'Trades while you sleep',pnl:'+13.00%',loss:'-5.50%',min:500,max:5000,runtime:'1h 40m',traders:'353.7K',hot:true},
+   ]},
+  {tier:'T4',tierLabel:'Gold Bots',tierColor:'#ffd600',tierBg:'rgba(255,214,0,.08)',description:'4-hour trades, 200 USDT minimum',
+   bots:[
+     {id:'wealth',name:'Wealth Builder',desc:'Build lasting wealth',pnl:'+10.00%',loss:'-4.00%',min:650,max:5000,runtime:'12h',traders:'122.1K',hot:false},
+     {id:'elite',name:'Elite Performer',desc:'Premium trading strategies',pnl:'+18.00%',loss:'-7.00%',min:500,max:10000,runtime:'12h',traders:'420.3K',hot:true},
+   ]},
+  {tier:'T5',tierLabel:'Platinum Bots',tierColor:'#e5e4e2',tierBg:'rgba(229,228,226,.08)',description:'12-hour trades, 500 USDT minimum',
+   bots:[
+     {id:'phoenix',name:'Phoenix Rising',desc:'Rise from market ashes',pnl:'+20.00%',loss:'-8.00%',min:500,max:10000,runtime:'12h',traders:'130.6K',hot:true},
+   ]},
+  {tier:'T6',tierLabel:'Diamond Bots',tierColor:'#00bcd4',tierBg:'rgba(0,188,212,.08)',description:'24-hour trades, 1000 USDT minimum',
+   bots:[
+     {id:'whale',name:'Whale Maker',desc:'Transform into a crypto whale',pnl:'+25.00%',loss:'-10.00%',min:1500,max:50000,runtime:'1d 0h',traders:'155.1K',hot:true},
+     {id:'apex',name:'Apex Predator',desc:'Dominate the markets',pnl:'+22.00%',loss:'-8.00%',min:1000,max:50000,runtime:'1d 0h',traders:'252.0K',hot:true},
+   ]},
+];
+let botTierFilter='all';
+function filterBotTier(t,btn){botTierFilter=t;document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');buildBotsList();}
+function buildBotsList(){
+  if(!S.user)return;
+  const el=$('botsList');if(!el)return;
+  const bal=S.real.bal+S.demo.bal;
+  if($('botBalStat'))$('botBalStat').textContent='💵 $'+fmt(bal,2)+' USDT';
+  const tradesLeft=Math.max(0,2-S.botCount);
+  if($('botTrdStat'))$('botTrdStat').textContent=`🎯 ${tradesLeft} Trades Left`;
+  let html='';
+  BOTS_DATA.forEach(tier=>{
+    if(botTierFilter!=='all'&&tier.tier!==botTierFilter)return;
+    html+=`<div class="tier-label"><span class="tier-badge" style="background:${tier.tierBg};color:${tier.tierColor};">${tier.tierLabel}</span><span class="tier-desc">${tier.description}</span></div>`;
+    tier.bots.forEach(bot=>{
+      const isActive=S.activeBots.find(b=>b.id===bot.id);
+      const needMore=bal<bot.min;
+      if(bot.hot)html+=`<div style="padding:0 14px 6px;"><div class="hot-badge">🔥 HOT — Top Rated</div></div>`;
+      html+=`<div class="bot-card hot" style="background:linear-gradient(135deg,#1a0a00,#0d0d0d);">
+        <div class="bot-card-top">
+          <div class="bot-icon" style="background:rgba(255,109,0,.15);font-size:26px;">🔥</div>
+          <div><div class="bot-pnl" style="background:rgba(255,109,0,.1);color:var(--orange);">${bot.pnl} / ${bot.loss}</div>${bot.hot?`<div class="bot-hot">🔥 HOT</div>`:''}</div>
+        </div>
+        <div class="bot-name">${bot.name}</div>
+        <div class="bot-desc">${bot.desc}</div>
+        <div class="bot-meta">
+          <div class="bot-meta-item"><label>Min/Max</label><span>$${bot.min} — $${fmt(bot.max,0)}</span></div>
+          <div class="bot-meta-item"><label>⏱ Runtime</label><span>${bot.runtime}</span></div>
+        </div>
+        <div class="bot-traders">👥 <strong>${bot.traders}</strong> active traders</div>
+        ${needMore?`<div class="bot-need">⚠️ Need $${bot.min} USDT minimum</div>`:''}
+        ${isActive?
+          `<button class="bot-start-btn" style="background:var(--red);color:#fff;" onclick="stopBotById('${bot.id}')">⬛ Stop Bot</button>`:
+          `<button class="bot-start-btn" style="background:linear-gradient(135deg,#1a3a6a,#0d1a3a);color:${needMore?'#555':'#fff'};" onclick="openBotModal('${bot.id}')" ${needMore?'disabled':''}>▶ Start Bot</button>`
+        }
+      </div>`;
+    });
+  });
+  el.innerHTML=html;
+}
+let pendingBotId=null;
+function openBotModal(id){
+  const all=BOTS_DATA.flatMap(t=>t.bots);
+  const bot=all.find(b=>b.id===id);if(!bot)return;
+  pendingBotId=id;
+  if($('botModalTitle'))$('botModalTitle').textContent=bot.name;
+  if($('botModalBody'))$('botModalBody').innerHTML=`<div style="background:#1a1a1a;border-radius:var(--r);padding:14px;margin-bottom:14px;font-size:12px;line-height:2.2;color:var(--text2);">
+    💵 Min: <strong style="color:#fff;">$${bot.min}</strong><br>
+    📈 Profit: <strong style="color:var(--green);">${bot.pnl}</strong><br>
+    📉 Max Loss: <strong style="color:var(--red);">${bot.loss}</strong><br>
+    ⏱ Runtime: <strong style="color:#fff;">${bot.runtime}</strong><br>
+    🎯 Mode: <strong style="color:var(--yellow);">${S.real.bal>0?'REAL':'DEMO'}</strong>
+  </div>`;
+  openModal('botModal');
+}
+function confirmStartBot(){
+  closeModal('botModal');
+  if(!pendingBotId)return;
+  const all=BOTS_DATA.flatMap(t=>t.bots);
+  const bot=all.find(b=>b.id===pendingBotId);if(!bot)return;
+  const mode=S.real.bal>=bot.min?'real':'demo';
+  const activeBotEntry={id:bot.id,name:bot.name,mode,bg:'rgba(255,109,0,.15)',pl:0,trades:0,wins:0};
+  S.activeBots.push(activeBotEntry);
+  showToast(`🤖 ${bot.name} started on ${mode.toUpperCase()}!`,'ok');
+  alog(`Bot start: ${S.user.email} — ${bot.name} [${mode}]`);
+  buildBotsList();
+  const ticker=setInterval(()=>{
+    const entry=S.activeBots.find(b=>b.id===bot.id);if(!entry){clearInterval(ticker);return;}
+    const isWin=Math.random()>.35;
+    const tradeAmt=(S[mode].bal||30)*rnd(.03,.1);
+    const pnl=isWin?parseFloat((tradeAmt*rnd(.02,.08)).toFixed(2)):-parseFloat((tradeAmt*rnd(.01,.04)).toFixed(2));
+    entry.pl+=pnl;entry.trades++;if(isWin)entry.wins++;
+    S[mode].bal=Math.max(0,parseFloat((S[mode].bal+pnl).toFixed(2)));
+    S.botCount++;S.botPL+=pnl;if(isWin)S.botWins++;
+    const pair=pick(PAIRS);
+    S.history.unshift({time:tsStr(),pair,side:pick(['buy','sell']),lev:1,amt:tradeAmt,entryPx:PX[pair],exitPx:PX[pair]*(1+(pnl>0?rnd(.001,.005):-rnd(.001,.003))),pnl,result:isWin?'WIN':'LOSS',mode});
+    saveCurrentUser();
+    if(document.querySelector('#L_dash.active'))buildDash();
+  },10000+Math.random()*10000);
+}
+function stopBotById(id){
+  S.activeBots=S.activeBots.filter(b=>b.id!==id);
+  showToast('Bot stopped.','info');buildBotsList();
+}
+
+// ── SPOT TRADING ──────────────────────────────────────────
+let currentSpotPair='BTCUSDT',spotSide='buy',spotTF='60';
+function buildSpotList(){
+  const el=$('pairListEl');if(!el)return;
+  el.innerHTML=PAIRS.map(p=>{const c=parseFloat(PX_CHG[p]||0),up=c>=0,isV=p===currentSpotPair;
+    return`<div class="pair-list-item">
+      <div class="pli-left">
+        <div class="pli-icon" style="background:${COIN_COLORS[p]}22;color:${COIN_COLORS[p]};font-weight:800;font-size:16px;">${COIN_ICONS[p]}</div>
+        <div><div class="pli-sym">${p.replace('USDT','/USDT')}</div><div class="pli-name">${PAIR_NAMES[p]}</div></div>
+      </div>
+      <div style="text-align:center;"><div class="pli-mid">$${fmtPx(PX[p])}</div><div class="pli-chg" style="color:${up?'var(--green)':'var(--red)'};">${up?'+':''}${c.toFixed(2)}%</div></div>
+      <button class="pli-view-btn ${isV?'viewing':''}" onclick="openSpotChart('${p}',this)">${isV?'Viewing':'View'}</button>
+    </div>`;
+  }).join('');
+}
+function filterPairs(){
+  const q=$('pairSearch')?.value.toLowerCase()||'';
+  document.querySelectorAll('.pair-list-item').forEach((el,i)=>{el.style.display=PAIRS[i].toLowerCase().includes(q)||PAIR_NAMES[PAIRS[i]].toLowerCase().includes(q)?'flex':'none';});
+}
+function filterSpotType(t,btn){document.querySelectorAll('#spotPairList .spread-tab').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
+function openSpotChart(pair,btn){
+  currentSpotPair=pair;
+  $('spotPairList').style.display='none';
+  $('spotChart').style.display='block';
+  $('chartPairTitle').textContent=pair.replace('USDT','/USDT');
+  updateSpotChartPrices();initSpotTV();
+  setSpotSide('buy');
+  if($('spotExecBtn'))$('spotExecBtn').textContent='▲ BUY '+pair.replace('USDT','/USDT');
+}
+function showSpotList(){$('spotPairList').style.display='block';$('spotChart').style.display='none';}
+function updateSpotChartPrices(){
+  const px=PX[currentSpotPair],chg=parseFloat(PX_CHG[currentSpotPair]||0),up=chg>=0;
+  if($('chartPrice'))$('chartPrice').textContent='$'+fmtPx(px);
+  if($('chartChg')){$('chartChg').textContent=(up?'↑ +':'↓ ')+Math.abs(chg).toFixed(2)+'%';$('chartChg').className='cpg-val '+(up?'green':'red');}
+  if($('chartHigh'))$('chartHigh').textContent='$'+fmtPx(px*1.015);
+  if($('chartLow'))$('chartLow').textContent='$'+fmtPx(px*0.985);
+  if($('chartVol'))$('chartVol').textContent=fmtM(rnd(20,40)*1e9);
+  if($('chartVolUSDT'))$('chartVolUSDT').textContent='$'+fmtM(rnd(20,40)*1e9);
+}
+function initSpotTV(){
+  const c=$('spotTVContainer');if(!c)return;
+  c.innerHTML=`<div id="tv_spot_${Date.now()}" style="width:100%;height:320px;"></div>`;
+  const uid=c.firstChild.id;
+  function load(){
+    if(!window.TradingView)return;
+    new TradingView.widget({autosize:true,symbol:'BINANCE:'+currentSpotPair,interval:spotTF,timezone:'Etc/UTC',theme:'dark',style:'1',locale:'en',toolbar_bg:'#0a0a0a',enable_publishing:false,withdateranges:false,hide_side_toolbar:true,allow_symbol_change:false,save_image:false,container_id:uid,overrides:{'paneProperties.background':'#000','mainSeriesProperties.candleStyle.upColor':'#00c853','mainSeriesProperties.candleStyle.downColor':'#ff1744'},loading_screen:{backgroundColor:'#000',foregroundColor:'#00c853'}});
+  }
+  if(window.TradingView){load();}else{const s=document.createElement('script');s.src='https://s3.tradingview.com/tv.js';s.onload=load;document.head.appendChild(s);}
+}
+function setTF(tf,btn){spotTF=tf;document.querySelectorAll('.chart-tf-btn').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');initSpotTV();}
+function setSpotSide(side){
+  spotSide=side;
+  const b=$('stBuy'),sl=$('stSell'),ex=$('spotExecBtn');
+  if(b)b.className='trade-tab buy'+(side==='buy'?' on':'');
+  if(sl)sl.className='trade-tab sell'+(side==='sell'?' on':'');
+  if(ex){ex.className='trade-execute-btn '+(side==='buy'?'teb-buy':'teb-sell');ex.textContent=(side==='buy'?'▲ BUY ':'▼ SELL ')+currentSpotPair.replace('USDT','/USDT');}
+}
+function calcSpotSummary(){
+  const amt=parseFloat($('spotAmt')?.value||0),px=PX[currentSpotPair]||1;
+  const s=$('spotSummary');if(!s)return;
+  if(amt>0){s.style.display='block';s.innerHTML=`<div style="display:grid;gap:5px;"><div style="display:flex;justify-content:space-between;"><span>Entry Price</span><span style="font-family:var(--mono);font-weight:700;">$${fmtPx(px)}</span></div><div style="display:flex;justify-content:space-between;"><span>Coins</span><span style="font-family:var(--mono);font-weight:700;">${(amt/px).toFixed(6)}</span></div><div style="display:flex;justify-content:space-between;"><span>Available</span><span style="font-family:var(--mono);font-weight:700;">$${fmt(S.demo.bal,2)}</span></div></div>`;}
+  else s.style.display='none';
+}
+function placeSpotTrade(){
+  if(!S.user){showToast('Login first.','err');return;}
+  const amt=parseFloat($('spotAmt')?.value||0);
+  if(amt<1){showToast('Minimum $1.','err');return;}
+  if(amt>S.demo.bal){showToast('Insufficient balance.','err');return;}
+  const px=PX[currentSpotPair];
+  S.demo.bal=parseFloat((S.demo.bal-amt).toFixed(2));
+  const pos={id:Date.now(),pair:currentSpotPair,side:spotSide,amt,px,mode:'demo',openTime:tsStr(),closed:false};
+  S.positions.push(pos);saveCurrentUser();
+  showToast(`${spotSide==='buy'?'▲ BUY':'▼ SELL'} ${currentSpotPair.replace('USDT','/USDT')} opened!`,'ok');
+  setTimeout(()=>{
+    pos.closed=true;
+    const dir=spotSide==='buy'?1:-1,curPx=PX[currentSpotPair];
+    const pnl=parseFloat(((curPx-px)/px*amt*dir*(0.5+Math.random())).toFixed(2));
+    S.demo.bal=Math.max(0,parseFloat((S.demo.bal+amt+pnl).toFixed(2)));
+    S.history.unshift({time:tsStr(),pair:currentSpotPair,side:spotSide,lev:1,amt,entryPx:px,exitPx:curPx,pnl,result:pnl>0?'WIN':'LOSS',mode:'demo'});
+    saveCurrentUser();
+    showToast(`${pnl>0?'🎉 WIN':'😔 LOSS'}: ${pnl>0?'+':''}$${fmt(pnl,2)}`,pnl>0?'ok':'err',5000);
+  },rnd(15000,60000));
+}
+
+// ── SPREAD ────────────────────────────────────────────────
+const SPREAD_COINS=[
+  {sym:'AAVE',name:'Aave',chg:+1.0,tf:'10 min',icon:'🔵'},
+  {sym:'BNB',name:'BNB',chg:-2.0,tf:'15 min',icon:'🟡'},
+  {sym:'BSV',name:'Bitcoin SV',chg:-5.0,tf:'15 min',icon:'🟠'},
+  {sym:'BTC',name:'Bitcoin',chg:+6.0,tf:'30 min',icon:'₿'},
+  {sym:'DAI',name:'Dai',chg:-0.1,tf:'15 min',icon:'🟡'},
+  {sym:'ETH',name:'Ethereum',chg:+2.8,tf:'15 min',icon:'Ξ'},
+  {sym:'SOL',name:'Solana',chg:+2.2,tf:'10 min',icon:'◎'},
+  {sym:'XRP',name:'Ripple',chg:+1.1,tf:'15 min',icon:'✕'},
+];
+function buildSpreadList(){
+  if($('spreadBal'))$('spreadBal').textContent='$'+fmt(S.demo.bal+S.real.bal,2);
+  const el=$('spreadList');if(!el)return;
+  el.innerHTML=SPREAD_COINS.map(c=>{const up=c.chg>=0;
+    return`<div class="spread-coin">
+      <div class="sc-left"><div class="sc-icon">${c.icon}</div><div><div style="display:flex;align-items:center;gap:6px;"><span class="sc-sym">${c.sym}</span><span class="sc-chg" style="background:${up?'rgba(0,200,83,.1)':'rgba(255,23,68,.1)'};color:${up?'var(--green)':'var(--red)'};">${up?'+':''}${c.chg}%</span></div><div style="font-size:11px;color:var(--text2);margin-top:2px;">${c.name} · ${c.tf}</div></div></div>
+      <div class="sc-actions"><button class="sc-buy-btn" onclick="placeSpreadTrade('${c.sym}','buy')">Buy</button><button class="sc-sell-btn" onclick="placeSpreadTrade('${c.sym}','sell')">Sell</button></div>
+    </div>`;
+  }).join('');
+}
+function filterSpread(tab,btn){document.querySelectorAll('.spread-tab').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
+function placeSpreadTrade(sym,side){
+  if(!S.user){showToast('Login first.','err');return;}
+  showToast(`${side==='buy'?'▲ BUY':'▼ SELL'} ${sym} order placed!`,'ok');
+}
+
+// ── HISTORY ───────────────────────────────────────────────
+function buildHistory(){
+  const pl=S.history.reduce((s,t)=>s+t.pnl,0);
+  const wins=S.history.filter(t=>t.result==='WIN').length;
+  const wr=S.history.length?(wins/S.history.length*100).toFixed(1)+'%':'—';
+  if($('histPL')){$('histPL').textContent=(pl>=0?'+':'')+'$'+fmt(pl,2);$('histPL').style.color=pl>=0?'var(--green)':'var(--red)';}
+  if($('histWR'))$('histWR').textContent=wr;
+  if($('histTotal'))$('histTotal').textContent=S.history.length;
+  const el=$('histList');if(!el)return;
+  if(!S.history.length){el.innerHTML='<div style="text-align:center;padding:32px;color:var(--text2);font-size:13px;">No trades yet.</div>';return;}
+  el.innerHTML=S.history.map(t=>`<div class="hist-row">
+    <div class="hr-top">
+      <div><div class="hr-pair">${t.pair.replace('USDT','/USDT')} <span style="color:${t.side==='buy'?'var(--green)':'var(--red)'};">${t.side==='buy'?'▲ LONG':'▼ SHORT'}</span></div><div class="hr-meta">${t.time} · ${t.mode?.toUpperCase()}</div></div>
+      <div style="text-align:right;"><div class="hr-pnl" style="color:${t.pnl>=0?'var(--green)':'var(--red)'};">${t.pnl>=0?'+':''}$${fmt(t.pnl,2)}</div><span class="hr-result ${t.result==='WIN'?'hr-win':'hr-loss'}">${t.result}</span></div>
+    </div>
+    <div class="hr-meta">Entry $${fmtPx(t.entryPx)} → Exit $${fmtPx(t.exitPx)}</div>
+  </div>`).join('');
+}
+
+// ── REFERRAL ──────────────────────────────────────────────
+function buildReferral(){
+  if(!S.user)return;
+  const link=`${window.location.href.split('?')[0]}?ref=${S.user.refCode}`;
+  if($('refLinkBox'))$('refLinkBox').textContent=link;
+  const refs=Object.values(USERS).filter(u=>u.referredBy===S.user.refCode);
+  const earned=AD.deps.filter(d=>refs.find(r=>r.email===d.email)&&d.status==='credited').reduce((s,d)=>s+(d.creditedAmt||0)*.1,0);
+  if($('refCount'))$('refCount').textContent=refs.length;
+  if($('refEarned'))$('refEarned').textContent='$'+fmt(earned,2);
+}
+function copyRefLink(){if(S.user)copyText(`${window.location.href.split('?')[0]}?ref=${S.user?.refCode}`);}
+function shareRef(via){
+  const link=`${window.location.href.split('?')[0]}?ref=${S.user?.refCode}`;
+  const msg=encodeURIComponent('Join CryptoPro Trading & get $30 FREE bonus! 🚀 '+link);
+  const urls={wa:`https://wa.me/?text=${msg}`,tg:`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`,tw:`https://twitter.com/intent/tweet?text=${msg}`,fb:`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`};
+  window.open(urls[via],'_blank');
+}
+
+// ── PROFILE ───────────────────────────────────────────────
+function loadProfile(){
+  if(!S.user)return;
+  const u=S.user;
+  if($('profAvatar'))$('profAvatar').textContent=u.name[0].toUpperCase();
+  if($('profName'))$('profName').textContent=u.name;
+  if($('profEmail'))$('profEmail').textContent=u.email;
+  if($('profJoined'))$('profJoined').textContent='Member since: '+(u.registeredAt||'—');
+  if($('profRefCode'))$('profRefCode').textContent=u.refCode||'—';
+  if($('prName'))$('prName').value=u.name;
+  if($('prPhone'))$('prPhone').value=u.phone||'';
+}
+function doUpdateProfile(e){
+  e.preventDefault();if(!S.user)return false;
+  const u=USERS[S.user.email];if(!u)return false;
+  u.name=$('prName').value.trim();u.phone=$('prPhone').value.trim();
+  const np=$('prPw').value;if(np){if(np.length<6){showToast('Password min 6 chars.','err');return false;}u.pw=np;}
+  S.user=u;saveUsers();showToast('✅ Profile updated!');return false;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────
+function buildSettings(){
+  const ns=$('notifSettings');
+  if(ns)ns.innerHTML=[{k:'notifTrades',l:'Trade Notifications',s:'Get notified on every trade'},{k:'notifDeposit',l:'Deposit Alerts',s:'Deposit status updates'},{k:'notifSignals',l:'Signal Alerts',s:'New AI signals'},{k:'soundEffects',l:'Sound Effects',s:'Play sounds on trade events'}].map(i=>`<div class="settings-item"><div><div class="settings-lbl">${i.l}</div><div class="settings-sub">${i.s}</div></div><button class="toggle ${appSettings[i.k]?'on':''}" onclick="toggleSetting('${i.k}',this)"></button></div>`).join('');
+  const tp=$('tradingPrefs');
+  if(tp)tp.innerHTML=[{k:'confirmOrders',l:'Confirm Orders',s:'Show confirmation before placing'}].map(i=>`<div class="settings-item"><div><div class="settings-lbl">${i.l}</div><div class="settings-sub">${i.s}</div></div><button class="toggle ${appSettings[i.k]?'on':''}" onclick="toggleSetting('${i.k}',this)"></button></div>`).join('');
+}
+function toggleSetting(k,btn){appSettings[k]=!appSettings[k];btn.className='toggle'+(appSettings[k]?' on':'');saveSettings();}
+function deleteAccount(){if(!S.user)return;delete USERS[S.user.email];saveUsers();doLogout();showToast('Account deleted.','info');}
+
+// ══════════════════════════════════════════════════════════
+//  AI SUPPORT CHAT — Powered by Claude AI
+// ══════════════════════════════════════════════════════════
+let aiChatHistory=[];
+let aiTyping=false;
+
+const AI_SYSTEM_PROMPT=`You are a friendly and knowledgeable AI support assistant for CryptoPro, a cryptocurrency trading platform. Your name is CryptoAI.
+
+Key platform details you know:
+- Minimum deposit: $30 USDT
+- Supported deposit methods: USDT (TRC20), BTC (Bitcoin Network), ETH (ERC20), BNB (BSC/BEP20), SOL (Solana)
+- Payment addresses: BTC: 14DZxGVHNKaX6WkwhKwq66B31VoUUNfqYZ | USDT TRC20: TK4rUz6TUEd7zCWeuiX5R47pSNdPswJnAc | ETH/BNB ERC20/BSC: 0xd4a2fd2b053cbe8d9c7cc2715173c61506f4833d | SOL: GSCQFHE66hF1NPg4vGgKZXwFwvqw1yFSzpPtfmNKPSP
+- Withdrawal minimum: $50, fee: 2%, processing: 5-30 minutes
+- Withdrawal methods: M-Pesa, Bank Transfer, USDT TRC-20
+- Trading bots: 25 bots across 6 tiers (T1-T6), starting from $30 USDT
+- Spot trading: 10 pairs including BTC, ETH, BNB, SOL, XRP, ADA, DOGE, DOT, TRX, AVAX
+- Demo account: $30 free bonus on signup
+- Referral program: 10% lifetime commission on referral deposits
+- WhatsApp support: +254 759 401 893
+- Admin credits accounts within 10 minutes of deposit verification
+
+Be concise, helpful, and friendly. Use emojis occasionally. If asked about payment addresses, always provide the correct ones listed above. For urgent issues always recommend WhatsApp: +254 759 401 893.`;
+
+async function sendAIMessage(userMsg){
+  if(aiTyping)return;
+  aiTyping=true;
+
+  // Disable input
+  const sendBtn=$('chatSendBtn');
+  const input=$('chatInput');
+  if(sendBtn)sendBtn.disabled=true;
+
+  // Add user message to history
+  aiChatHistory.push({role:'user',content:userMsg});
+
+  // Show typing indicator
+  const box=$('chatBox');
+  const typingEl=document.createElement('div');
+  typingEl.className='chat-typing';
+  typingEl.id='chatTyping';
+  typingEl.textContent='●●●';
+  if(box){box.appendChild(typingEl);box.scrollTop=box.scrollHeight;}
+
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:AI_SYSTEM_PROMPT,
+        messages:aiChatHistory,
+      }),
+    });
+
+    const data=await response.json();
+    const reply=data.content?.[0]?.text||"I'm having trouble connecting. Please contact us on WhatsApp: +254 759 401 893";
+
+    // Add AI response to history
+    aiChatHistory.push({role:'assistant',content:reply});
+
+    // Remove typing indicator and add reply
+    const te=$('chatTyping');if(te)te.remove();
+    addBotMsg(reply);
+
+  }catch(err){
+    const te=$('chatTyping');if(te)te.remove();
+    addBotMsg("⚠️ I'm having trouble connecting to AI right now. For immediate help, please WhatsApp us at +254 759 401 893 — we're available 24/7! 💬");
+  }
+
+  aiTyping=false;
+  if(sendBtn)sendBtn.disabled=false;
+  if(input)input.focus();
+}
+
+function initSupport(){
+  const box=$('chatBox');
+  if(!box)return;
+  // Only init once
+  if(box.children.length>0){buildFAQ();return;}
+  aiChatHistory=[];
+  addBotMsg('👋 Hi! I\'m CryptoAI, your 24/7 AI assistant powered by Claude. I can help with deposits, withdrawals, trading bots, and anything about our platform. What can I help you with today?');
+  const qr=$('chatQR');
+  if(qr)qr.innerHTML=[
+    '💰 How to deposit?',
+    '💸 Withdrawal info',
+    '🤖 Trading bots',
+    '🎁 Referral bonus',
+    '📬 Payment address',
+    '⚡ Account issues',
+  ].map(q=>`<button class="qr-btn" onclick="sendQuick('${q}')">${q}</button>`).join('');
+  buildFAQ();
+}
+
+function addBotMsg(m){
+  const box=$('chatBox');if(!box)return;
+  const b=document.createElement('div');
+  b.className='chat-msg bot';
+  b.textContent=m;
+  box.appendChild(b);
+  box.scrollTop=box.scrollHeight;
+}
+function addUserMsg(m){
+  const box=$('chatBox');if(!box)return;
+  const b=document.createElement('div');
+  b.className='chat-msg user';
+  b.textContent=m;
+  box.appendChild(b);
+  box.scrollTop=box.scrollHeight;
+}
+function sendChat(){
+  const inp=$('chatInput');
+  if(!inp||!inp.value.trim()||aiTyping)return;
+  const m=inp.value.trim();
+  inp.value='';
+  addUserMsg(m);
+  sendAIMessage(m);
+}
+function sendQuick(q){
+  if(aiTyping)return;
+  addUserMsg(q);
+  sendAIMessage(q);
+}
+
+// ── FAQ ───────────────────────────────────────────────────
+const FAQ=[
+  {q:'How do I deposit funds?',a:'Go to Wallet → Deposit. Select your crypto (USDT TRC20 min $30), choose wallet, enter amount, then send to the address shown. Admin credits within 10 minutes.'},
+  {q:'What is the minimum deposit?',a:'Minimum is $30 USDT. First real deposit may get a welcome bonus — contact admin on WhatsApp!'},
+  {q:'What payment addresses do you use?',a:'BTC: 14DZxGVHNKaX6WkwhKwq66B31VoUUNfqYZ | USDT TRC20: TK4rUz6TUEd7zCWeuiX5R47pSNdPswJnAc | ETH/BNB: 0xd4a2fd2b053cbe8d9c7cc2715173c61506f4833d | SOL: GSCQFHE66hF1NPg4vGgKZXwFwvqw1yFSzpPtfmNKPSP'},
+  {q:'How do trading bots work?',a:'Select a bot from Trading Bots section, check minimum amount and runtime, then click Start Bot. Bot auto-trades using AI algorithms on demo or real account.'},
+  {q:'How do I withdraw?',a:'Go to Withdrawal. Minimum $50, 2% fee, processing 5-30 minutes. Supports M-Pesa, Bank Transfer, and USDT TRC-20.'},
+  {q:'What is Spot vs Funding wallet?',a:'Spot Wallet is for bot trading & investments. Funding Wallet is for deposits & withdrawals.'},
+];
+function buildFAQ(){
+  const el=$('faqList');if(!el||el.children.length>0)return;
+  el.innerHTML=FAQ.map((f,i)=>`<div class="faq-item"><div class="faq-q" onclick="toggleFAQ(${i})">${f.q}<span id="fa${i}">▼</span></div><div class="faq-a" id="fb${i}">${f.a}</div></div>`).join('');
+}
+function toggleFAQ(i){const a=$(`fb${i}`);if(!a)return;a.classList.toggle('open');$(`fa${i}`).textContent=a.classList.contains('open')?'▲':'▼';}
+
+// ── ADMIN ─────────────────────────────────────────────────
+function showAdminPanel(){AD.in=true;$('adminOverlay').classList.add('show');buildAdminStats();renderPendDeps();renderRecentUsers();}
+function hideAdmin(){$('adminOverlay').classList.remove('show');}
+function adminLogout(){AD.in=false;hideAdmin();showLayer('L_welcome');}
+function showAP(id,btn){document.querySelectorAll('.ap').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');if(id==='ap_deps')renderDeps();if(id==='ap_wds')renderWds();if(id==='ap_users')renderUsers();if(id==='ap_logs')renderLogs();if(id==='ap_manual')renderAdjLog();}
+function buildAdminStats(){
+  const el=$('adminStats');if(!el)return;
+  const users=Object.values(USERS);
+  const totalDeps=AD.deps.filter(d=>d.status==='credited').reduce((s,d)=>s+d.creditedAmt,0);
+  const pendDeps=AD.deps.filter(d=>d.status==='pending').length;
+  const stats=[{l:'Users',v:users.length},{l:'Total Credited',v:'$'+fmt(totalDeps,0)},{l:'Pending Deps',v:pendDeps},{l:'Withdrawals',v:AD.wds.length},{l:'Real Accounts',v:users.filter(u=>u.real?.bal>0).length},{l:'Total Logs',v:AD.logs.length}];
+  el.innerHTML=stats.map(s=>`<div class="a-stat"><div class="a-stat-val">${s.v}</div><div class="a-stat-lbl">${s.l}</div></div>`).join('');
+}
+function renderPendDeps(){
+  const el=$('adminPendDeps');if(!el)return;
+  const pend=AD.deps.filter(d=>d.status==='pending').slice(0,5);
+  if(!pend.length){el.innerHTML='<div style="font-size:12px;color:#555;padding:10px 0;">No pending deposits.</div>';return;}
+  el.innerHTML=pend.map(d=>`<div class="dep-req">
+    <div class="dep-req-top"><div><div class="dep-req-name">${d.name}</div><div class="dep-req-email">${d.email}</div></div><div class="dep-req-amt">$${fmt(d.amt,2)}</div></div>
+    <div class="dep-req-meta">${d.method} · ${d.submittedAt}</div>
+    <div class="dep-req-proof">${d.proof}</div>
+    <div class="dep-req-actions"><button class="abtn abtn-g" onclick="openCreditModal('${d.id}')">✅ Credit</button><button class="abtn abtn-r" onclick="rejectDep('${d.id}')">❌</button><button class="abtn abtn-wa" onclick="notifyUser('${d.email}','${d.name}')">💬</button></div>
+  </div>`).join('');
+}
+function renderRecentUsers(){
+  const el=$('adminRecentUsers');if(!el)return;
+  const users=Object.values(USERS).slice(-5).reverse();
+  if(!users.length){el.innerHTML='<div style="font-size:12px;color:#555;">No users.</div>';return;}
+  el.innerHTML=`<table class="a-tbl"><thead><tr><th>Name</th><th>Email</th><th>Demo</th><th>Real</th><th>Joined</th></tr></thead><tbody>${users.map(u=>`<tr><td style="font-weight:700;">${u.name}</td><td style="color:#555;">${u.email}</td><td>$${fmt(u.demo?.bal,2)}</td><td style="color:${(u.real?.bal||0)>0?'var(--green)':'#555'};">$${fmt(u.real?.bal,2)}</td><td style="color:#555;font-size:10px;">${u.registeredAt||'—'}</td></tr>`).join('')}</tbody></table>`;
+}
+function renderDeps(){
+  const el=$('depsList');if(!el)return;
+  const q=($('depSrch')?.value||'').toLowerCase(),f=$('depFilt')?.value||'all';
+  const list=AD.deps.filter(d=>(f==='all'||d.status===f)&&(!q||(d.name+d.email).toLowerCase().includes(q)));
+  if(!list.length){el.innerHTML='<div style="font-size:12px;color:#555;padding:12px;">No deposits found.</div>';return;}
+  el.innerHTML=list.map(d=>`<div class="dep-req">
+    <div class="dep-req-top"><div><div class="dep-req-name">${d.name}</div><div class="dep-req-email">${d.email}</div></div><div class="dep-req-amt">$${fmt(d.amt,2)}</div></div>
+    <div class="dep-req-meta">${d.method} · ${d.submittedAt}</div>
+    <div class="dep-req-proof">${d.proof}</div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;"><span class="s-badge s-${d.status}">${d.status}</span>${d.status==='pending'?`<button class="abtn abtn-g" onclick="openCreditModal('${d.id}')">✅ Credit</button><button class="abtn abtn-r" onclick="rejectDep('${d.id}')">❌</button>`:''}<button class="abtn abtn-wa" onclick="notifyUser('${d.email}','${d.name}')">💬</button></div>
+  </div>`).join('');
+}
+function renderWds(){
+  const el=$('wdsList');if(!el)return;
+  if(!AD.wds.length){el.innerHTML='<div style="font-size:12px;color:#555;padding:12px;">No withdrawals.</div>';return;}
+  el.innerHTML=AD.wds.map(w=>`<div class="dep-req">
+    <div class="dep-req-top"><div><div class="dep-req-name">${w.name}</div><div class="dep-req-email">${w.email}</div></div><div class="dep-req-amt" style="color:var(--red);">$${fmt(w.amt,2)}</div></div>
+    <div class="dep-req-meta">${w.method} · ${w.acct} · ${w.ts}</div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;"><span class="s-badge s-${w.status}">${w.status}</span>${w.status==='pending'?`<button class="abtn abtn-g" onclick="approveWd('${w.id}')">✅ Pay</button><button class="abtn abtn-r" onclick="rejectWd('${w.id}')">❌ Refund</button>`:''}<button class="abtn abtn-wa" onclick="notifyUser('${w.email}','${w.name}')">💬</button></div>
+  </div>`).join('');
+}
+function renderUsers(){
+  const el=$('usersList');if(!el)return;
+  const q=($('usrSrch')?.value||'').toLowerCase();
+  const users=Object.values(USERS).filter(u=>!q||(u.name+u.email).toLowerCase().includes(q));
+  if(!users.length){el.innerHTML='<div style="font-size:12px;color:#555;padding:12px;">No users.</div>';return;}
+  el.innerHTML=users.map(u=>`<div class="dep-req">
+    <div class="dep-req-top"><div><div class="dep-req-name">${u.name}</div><div class="dep-req-email">${u.email} · 📱${u.phone||'—'}</div></div><div><div style="font-family:var(--mono);font-size:12px;color:var(--green);">R:$${fmt(u.real?.bal,2)}</div><div style="font-family:var(--mono);font-size:11px;color:#555;">D:$${fmt(u.demo?.bal,2)}</div></div></div>
+    <div class="dep-req-meta">Joined: ${u.registeredAt||'—'} · Ref: ${u.refCode}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="abtn abtn-g" onclick="quickCredit('${u.email}')">+$</button><button class="abtn abtn-wa" onclick="notifyUser('${u.email}','${u.name}')">💬</button><button class="abtn abtn-r" onclick="deleteUser('${u.email}')">🗑</button></div>
+  </div>`).join('');
+}
+function renderLogs(){
+  const el=$('logsEl');if(!el)return;
+  const q=($('logSrch')?.value||'').toLowerCase();
+  const logs=AD.logs.filter(l=>!q||l.m.toLowerCase().includes(q)).slice(0,80);
+  if(!logs.length){el.innerHTML='<div style="font-size:12px;color:#555;">No logs.</div>';return;}
+  el.innerHTML=logs.map(l=>`<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:11px;"><span style="color:#555;flex-shrink:0;">${l.t}</span><span style="color:var(--text2);">${l.m}</span></div>`).join('');
+}
+function renderAdjLog(){
+  const el=$('adjLog');if(!el)return;
+  if(!AD.adjs.length){el.innerHTML='<div style="font-size:12px;color:#555;">No adjustments.</div>';return;}
+  el.innerHTML=AD.adjs.slice(0,20).map(a=>`<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #1a1a1a;font-size:11px;flex-wrap:wrap;"><span style="color:#555;">${a.t}</span><span style="font-weight:700;">${a.email}</span><span style="font-family:var(--mono);color:${a.amt>=0?'var(--green)':'var(--red)'};">${a.amt>=0?'+':''}$${fmt(a.amt,2)}</span><span style="color:var(--text2);">${a.note}</span></div>`).join('');
+}
+function openCreditModal(depId){
+  const dep=AD.deps.find(d=>d.id===depId);if(!dep)return;
+  if($('aCreditInfo'))$('aCreditInfo').innerHTML=`<strong>${dep.name}</strong> (${dep.email})<br>💵 $${fmt(dep.amt,2)} via ${dep.method}<br>📝 ${dep.proof}`;
+  if($('aCreditAmt'))$('aCreditAmt').value=dep.amt;
+  if($('aBonusAmt'))$('aBonusAmt').value=dep.amt;
+  if($('aCreditNote'))$('aCreditNote').value=dep.method+' confirmed';
+  $('aCreditModal').dataset.depId=depId;
+  openModal('aCreditModal');
+}
+function doAdminCredit(){
+  const depId=$('aCreditModal').dataset.depId;
+  const dep=AD.deps.find(d=>d.id===depId);if(!dep)return;
+  const amt=parseFloat($('aCreditAmt').value||0);
+  const bonus=parseFloat($('aBonusAmt').value||0);
+  const note=$('aCreditNote').value;
+  const u=USERS[dep.email];if(!u){showToast('User not found.','err');return;}
+  const total=amt+bonus;
+  u.real.bal=parseFloat(((u.real?.bal||0)+total).toFixed(2));
+  u.deposits=(u.deposits||0)+amt;u.pending=null;
+  dep.status='credited';dep.creditedAmt=total;dep.creditedAt=nowStr();dep.note=note;
+  saveUsers();saveAD();alog(`Credited $${total} to ${dep.email}`);
+  const msg=`✅ *Account Credited!*\nHi ${dep.name}!\n💰 Deposit: $${fmt(amt,2)}\n🎁 Bonus: $${fmt(bonus,2)}\n💵 Total: $${fmt(total,2)} added to your Real Account.\nHappy trading on CryptoPro! 🚀`;
+  window.open(`https://wa.me/${u.phone?.replace(/\D/g,'')||''}?text=${encodeURIComponent(msg)}`,'_blank');
+  closeModal('aCreditModal');renderDeps();renderPendDeps();buildAdminStats();
+  showToast(`✅ $${fmt(total,2)} credited to ${dep.name}!`,'ok');
+}
+function rejectDep(id){
+  const dep=AD.deps.find(d=>d.id===id);if(!dep)return;
+  dep.status='rejected';const u=USERS[dep.email];if(u)u.pending=null;
+  saveUsers();saveAD();alog(`Rejected deposit: ${dep.email}`);
+  renderDeps();renderPendDeps();showToast('Deposit rejected.','warn');
+}
+function approveWd(id){const wd=AD.wds.find(w=>w.id===id);if(!wd)return;wd.status='approved';saveAD();renderWds();showToast('Withdrawal approved.','ok');}
+function rejectWd(id){
+  const wd=AD.wds.find(w=>w.id===id);if(!wd)return;
+  const u=USERS[wd.email];if(u){u.real.bal=parseFloat(((u.real?.bal||0)+wd.amt).toFixed(2));saveUsers();}
+  wd.status='rejected';saveAD();renderWds();showToast('Rejected. Funds refunded.','warn');
+}
+function quickCredit(email){
+  const amt=prompt(`Credit amount for ${email}? (negative to deduct)`);if(!amt)return;
+  const a=parseFloat(amt);if(isNaN(a))return;
+  const u=USERS[email];if(!u)return;
+  u.real.bal=Math.max(0,parseFloat(((u.real?.bal||0)+a).toFixed(2)));
+  saveUsers();AD.adjs.push({t:nowStr(),email,amt:a,note:'Quick credit'});saveAD();
+  alog(`Quick credit: ${email} ${a>=0?'+':''}$${a}`);
+  showToast(`${a>=0?'+':''}$${fmt(a,2)} applied.`,'ok');renderUsers();
+}
+function deleteUser(email){if(!confirm(`Delete ${email}?`))return;delete USERS[email];saveUsers();renderUsers();showToast('Deleted.','warn');}
+function notifyUser(email,name){const u=USERS[email];const msg=`Hi ${name}! 👋 This is CryptoPro Trading support.`;window.open(`https://wa.me/${u?.phone?.replace(/\D/g,'')||'254759401893'}?text=${encodeURIComponent(msg)}`,'_blank');}
+function doManualCredit(){
+  const email=$('manEmail')?.value.trim(),type=$('manType')?.value;
+  const amt=parseFloat($('manAmt')?.value||0),note=$('manNote')?.value||'Admin';
+  if(!email||!amt){showToast('Fill email and amount.','err');return;}
+  const u=USERS[email];if(!u){showToast('User not found.','err');return;}
+  u[type].bal=Math.max(0,parseFloat(((u[type]?.bal||0)+amt).toFixed(2)));
+  saveUsers();AD.adjs.push({t:nowStr(),email,amt,note});saveAD();
+  alog(`Manual credit: ${email} ${amt>=0?'+':''}$${amt} [${type}]`);
+  renderAdjLog();showToast(`Applied ${amt>=0?'+':''}$${fmt(amt,2)} to ${u.name}.`,'ok');
+}
+
+// ── URL REF CHECK ─────────────────────────────────────────
+function checkURLRef(){
+  const params=new URLSearchParams(window.location.search);
+  const ref=params.get('ref');
+  if(ref&&$('sRef'))$('sRef').value=ref.toUpperCase();
+}
+
+// ── INIT ──────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  checkURLRef();
+  buildWelcome();
+  buildTicker();
+  // Fetch live prices from Binance
+  setTimeout(()=>{
+    PAIRS.forEach(p=>{
+      fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${p}`)
+        .then(r=>r.json()).then(d=>{
+          PX[p]=parseFloat(d.lastPrice);
+          PX_CHG[p]=parseFloat(d.priceChangePercent);
+          buildTicker();updatePriceGrid();
+        }).catch(()=>{});
+    });
+  },500);
+});
+</script>
+</body>
+</html>
